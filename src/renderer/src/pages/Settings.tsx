@@ -9,8 +9,9 @@ import { Section, Spinner } from '../components/Common'
 import { QuotaMeter } from '../components/QuotaMeter'
 import { DiscordSection } from '../components/DiscordSection'
 import { StatsSection } from '../components/StatsSection'
+import { UpdateSection } from '../components/UpdateSection'
 
-const PLACEHOLDERS = ['releaseArtist', 'year', 'releaseTitle', 'catalogId', 'trackNo', 'trackTitle', 'title', 'version', 'trackArtist', 'brand', 'releaseType', 'label']
+const PLACEHOLDERS = ['releaseArtist', 'releaseArtistFull', 'year', 'releaseTitle', 'catalogId', 'trackNo', 'trackTitle', 'title', 'version', 'trackArtist', 'brand', 'releaseType', 'label']
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation()
@@ -54,9 +55,21 @@ export function SettingsPage() {
         </div>
       </Section>
 
+      <Section title={t('autoplay.settingsTitle')}>
+        <div className="card-box">
+          <label className="check">
+            <input type="checkbox" checked={settings.autoplay === true} onChange={(e) => void update({ autoplay: e.target.checked })} />
+            {t('autoplay.enable')}
+          </label>
+          <div className="hint">{t('autoplay.hint')}</div>
+        </div>
+      </Section>
+
       <DiscordSection />
 
       <StatsSection />
+
+      <UpdateSection />
 
       <Section title={t('settings.account.title')}>
         <div className="card-box">

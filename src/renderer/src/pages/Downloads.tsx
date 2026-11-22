@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { DownloadJob, JobStatus } from '@shared/types'
 import { FORMAT_LABEL } from '@shared/types'
 import { releaseCover } from '../lib/api'
 import { fmtBytes, fmtTime } from '../lib/format'
-import { useDownloads } from '../lib/stores'
+import { useDownloads, useLibrary } from '../lib/stores'
+import { LibraryView } from './Library'
 import { Cover, Empty } from '../components/Common'
 import { QuotaMeter } from '../components/QuotaMeter'
 import { ArtistLinks, TrackLink } from '../components/ArtistLinks'
@@ -48,19 +49,40 @@ function JobRow({ j }: { j: DownloadJob }) {
   )
 }
 
-export function DownloadsPage() {
+const ACTIVE_STATUSES: JobStatus[] = ['queued', 'preparing', 'downloading', 'tagging']
+
+/** Downloads-Ansicht mit den Tabs „Warteschlange“ und „Heruntergeladen“. */
+export function DownloadsPage({ tab }: { tab: 'queue' | 'library' }) {
+  const { t } = useTranslation()
+  const open = useDownloads((s) => s.queue.jobs.filter((j) => ACTIVE_STATUSES.includes(j.status)).length)
+  const downloaded = useLibrary((s) => Object.keys(s.snap.tracks).length)
+  const tabClass = ({ isActive }: { isActive: boolean }): string => `tab ${isActive ? 'active' : ''}`
+  return (
+    <div className="page">
+      <h1 className="page-title">{t('nav.downloads')}</h1>
+      <nav className="tabbar" aria-label={t('nav.downloads')}>
+        <NavLink to="/downloads" end className={tabClass}>
+          {t('downloads.tabQueue')}{open ? <span className="tab-count">{open}</span> : null}
+        </NavLink>
+        <NavLink to="/downloads/library" className={tabClass}>
+          {t('nav.library')}<span className="tab-count">{downloaded}</span>
+        </NavLink>
+      </nav>
+      {tab === 'queue' ? <QueueView /> : <LibraryView />}
+    </div>
+  )
+}
+
+function QueueView() {
   const { t } = useTranslation()
   const q = useDownloads((s) => s.queue)
   const counts = q.jobs.reduce<Record<string, number>>((m, j) => ({ ...m, [j.status]: (m[j.status] ?? 0) + 1 }), {})
-  const open = (counts.queued ?? 0) + (counts.preparing ?? 0) + (counts.downloading ?? 0) + (counts.tagging ?? 0)
+  const open = ACTIVE_STATUSES.reduce((n, s) => n + (counts[s] ?? 0), 0)
   const order: JobStatus[] = ['downloading', 'tagging', 'preparing', 'queued', 'error', 'cancelled', 'done', 'skipped']
   const jobs = [...q.jobs].sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status) || a.addedAt - b.addedAt)
   return (
-    <div className="page">
-      <div className="page-head-row">
-        <h1 className="page-title">{t('nav.downloads')}</h1>
-        <span className="muted">{t('downloads.summary', { open, done: counts.done ?? 0, skipped: counts.skipped ?? 0, errors: counts.error ?? 0 })}</span>
-      </div>
+    <>
+      <div className="tab-summary muted">{t('downloads.summary', { open, done: counts.done ?? 0, skipped: counts.skipped ?? 0, errors: counts.error ?? 0 })}</div>
       <QuotaMeter />
       {q.paused && (
         <div className="notice warn">
@@ -81,6 +103,6 @@ export function DownloadsPage() {
         <button className="btn btn-ghost" onClick={() => void window.ss.downloads.clearFinished()}>{t('downloads.clearFinished')}</button>
       </div>
       {jobs.length ? <div className="jobs">{jobs.map((j) => <JobRow key={j.id} j={j} />)}</div> : <Empty>{t('downloads.empty')}</Empty>}
-    </div>
+    </>
   )
 }

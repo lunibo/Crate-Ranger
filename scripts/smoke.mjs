@@ -5,7 +5,7 @@ import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 const outDir = process.argv[2] ?? 'smoke-out'
-const routes = process.argv.slice(3).length ? process.argv.slice(3) : ['/', '/browse', '/explore', '/artists', '/settings', '/library', '/downloads']
+const routes = process.argv.slice(3).length ? process.argv.slice(3) : ['/', '/browse', '/explore', '/artists', '/settings', '/downloads/library', '/downloads']
 mkdirSync(outDir, { recursive: true })
 const env = { ...process.env }
 delete env.ELECTRON_RUN_AS_NODE

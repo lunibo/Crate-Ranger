@@ -54,6 +54,8 @@ export interface TrackLite {
   trackNumber: number
   /** Release-Zeitpunkt liegt in der Zukunft → noch nicht herunterladbar */
   preRelease: boolean
+  /** von „Endlos hören“ angehängt */
+  autoplay?: boolean
 }
 
 export function toTrack(t: CatalogTrack): TrackLite {

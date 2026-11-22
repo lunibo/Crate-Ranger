@@ -39,7 +39,7 @@ describe.skipIf(!REAL_FLAC || !existsSync(REAL_FLAC))('tagger on real SoundScout
     }
   })
   it('keeps the embedded cover and reads IDs back', () => {
-    expect(readEmbeddedPicture(f)?.mimeType).toBe('image/png')
+    expect(readEmbeddedPicture(f)?.mimeType).toMatch(/^image\/(png|jpeg)$/)
     expect(readSoundScoutIds(f)?.trackId).toBe(meta.trackId)
   })
 })
@@ -53,7 +53,7 @@ describe.skipIf(!has('ffmpeg'))('tagger on generated MP3/WAV', () => {
       const t = ffprobeTags(f)
       expect(t.TITLE).toBe('Focus')
       expect(t.ALBUM_ARTIST ?? t.ALBUMARTIST).toBe('Shingo Nakamura')
-      const tf = TagFile.createFromPath(f); expect(tf.tag.genres).toEqual(['Dance', 'Melodic House & Techno']); expect(tf.tag.beatsPerMinute).toBe(118); tf.dispose()
+      const tf = TagFile.createFromPath(f); expect(tf.tag.genres).toEqual(['Melodic House & Techno', 'Dance']); expect(tf.tag.beatsPerMinute).toBe(118); tf.dispose()
       expect(t.DATE ?? t.TDRC).toContain('2022')
       expect(t.TKEY ?? t.INITIALKEY).toBe('Am')
       expect(t.SOUNDSCOUT_TRACK_ID).toBe(meta.trackId)

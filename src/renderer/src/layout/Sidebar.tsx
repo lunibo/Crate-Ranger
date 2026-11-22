@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
 import logo from '../assets/icon-64.png'
 import { useTranslation } from 'react-i18next'
+import { openRelease, useUpdate } from '../lib/update'
 import { useAuth, useDownloads } from '../lib/stores'
 import { QuotaMeter } from '../components/QuotaMeter'
 import {
-  IconChart, IconCompass, IconDownload, IconHeart, IconHome, IconLibrary, IconList, IconMic, IconSearch, IconSettings, IconSparkle, IconUser
+  IconChart, IconCompass, IconDownload, IconHeart, IconHome, IconList, IconMic, IconSearch, IconSettings, IconSparkle, IconUser
 } from '../components/Icons'
 
 const Item = ({ to, icon, label, badge }: { to: string; icon: React.ReactNode; label: string; badge?: number }) => (
@@ -17,6 +18,7 @@ const Item = ({ to, icon, label, badge }: { to: string; icon: React.ReactNode; l
 
 export function Sidebar() {
   const { t } = useTranslation()
+  const upd = useUpdate((s) => s.state)
   const auth = useAuth((s) => s.state)
   const busy = useAuth((s) => s.busy)
   const openDialog = useAuth((s) => s.openDialog)
@@ -31,6 +33,11 @@ export function Sidebar() {
           <div className="brand-sub">{t('brand.tagline')}</div>
         </div>
       </div>
+      {upd?.status === 'available' && upd.latestVersion && (
+        <button className="update-pill" onClick={() => openRelease(upd.url)} title={t('update.download')}>
+          {t('update.availableShort', { version: upd.latestVersion })}
+        </button>
+      )}
       <nav className="nav">
         <Item to="/" icon={<IconHome />} label={t('nav.home')} />
         <Item to="/search" icon={<IconSearch />} label={t('nav.search')} />
@@ -42,7 +49,6 @@ export function Sidebar() {
       <nav className="nav">
         <Item to="/playlists" icon={<IconList />} label={t('nav.playlists')} />
         <Item to="/favorites" icon={<IconHeart />} label={t('nav.favorites')} />
-        <Item to="/library" icon={<IconLibrary />} label={t('nav.library')} />
         <Item to="/field-report" icon={<IconChart />} label={t('nav.report')} />
         <Item to="/downloads" icon={<IconDownload />} label={t('nav.downloads')} badge={active} />
         <Item to="/settings" icon={<IconSettings />} label={t('nav.settings')} />

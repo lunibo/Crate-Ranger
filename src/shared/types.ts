@@ -202,6 +202,20 @@ export interface Settings {
   discordEnabled: boolean
   /** Hörstatistiken lokal sammeln (für Field Report) */
   statsEnabled: boolean
+  /** Endlos hören: am Ende der Warteschlange ähnliche Tracks weiterspielen. null = noch nie entschieden (→ einmalige Nachfrage) */
+  autoplay: boolean | null
+  /** Beim Start auf GitHub nach neuen Versionen suchen. null = noch nie gefragt (→ Nachfrage beim ersten Start) */
+  updateCheck: boolean | null
+}
+
+export interface UpdateState {
+  status: 'idle' | 'checking' | 'current' | 'available' | 'error'
+  currentVersion: string
+  latestVersion?: string
+  /** Release-Seite auf GitHub */
+  url?: string
+  checkedAt?: number
+  error?: string
 }
 
 // ---------- Hörstatistiken (lokal) ----------
@@ -382,6 +396,20 @@ export interface LibrarySnapshot {
   releases: Record<string, LibraryRelease>
 }
 
+export interface LibraryRefreshProgress {
+  done: number
+  total: number
+  current?: string
+}
+
+export interface LibraryRefreshResult {
+  total: number
+  retagged: number
+  moved: number
+  failed: number
+  errors: { path: string; error: string }[]
+}
+
 export interface ScanResult {
   scanned: number
   added: number
@@ -429,6 +457,12 @@ export interface SsBridge {
     get(): Promise<StatsData>
     clear(): Promise<void>
   }
+  update: {
+    state(): Promise<UpdateState>
+    /** sofort prüfen (auch ohne Zustimmung beim Start – nur auf ausdrücklichen Klick) */
+    check(): Promise<UpdateState>
+    onState(cb: (s: UpdateState) => void): () => void
+  }
   presence: {
     update(track: PresenceTrack | null): void
     status(): Promise<PresenceStatus>
@@ -439,6 +473,9 @@ export interface SsBridge {
     verify(): Promise<ScanResult>
     scan(): Promise<ScanResult>
     remove(trackId: string, deleteFiles: boolean): Promise<void>
+    /** Tags neu schreiben und Dateien nach aktuellem Ordner-Template einsortieren (kein Download). */
+    refresh(): Promise<LibraryRefreshResult>
+    onRefreshProgress(cb: (p: LibraryRefreshProgress) => void): () => void
     onUpdate(cb: (s: LibrarySnapshot) => void): () => void
   }
   settings: {

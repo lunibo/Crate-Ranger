@@ -168,6 +168,11 @@ export class DownloadQueue {
     this.changed()
   }
 
+  /** Laufen gerade Downloads (oder Vorbereitung/Tagging)? */
+  isBusy(): boolean {
+    return this.activeCount() > 0
+  }
+
   private activeCount(): number {
     return this.jobs.filter((j) => ACTIVE.includes(j.status)).length
   }

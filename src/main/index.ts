@@ -15,6 +15,8 @@ import { DownloadQueue } from './downloads/queue'
 import { splitPreReleases } from './downloads/prerelease'
 import { QuotaTracker, type PlanStatus } from './downloads/quota'
 import { assertAllowed, assertId } from './ipc'
+import { refreshLibrary } from './library/refresh'
+import { UpdateChecker } from './update'
 import { scanFolder } from './library/scanner'
 import { LibraryStore } from './library/store'
 import { handleMediaProtocol, isInside, registerMediaScheme } from './mediaProtocol'
@@ -238,16 +240,40 @@ app.whenReady().then(() => {
     return { scanned: r.checked, added: 0, missing: r.missing }
   })
   ipcMain.handle('library:scan', () => scanFolder(getSettings().downloadRoot, library))
+  let refreshing = false
+  ipcMain.handle('library:refresh', async () => {
+    if (refreshing) throw new Error(tr('errors.refreshRunning'))
+    if (queue.isBusy()) throw new Error(tr('errors.refreshBusy'))
+    refreshing = true
+    // Während des Umsortierens keine neuen Downloads starten
+    const wasPaused = queue.state().paused
+    if (!wasPaused) queue.pause(tr('queue.pausedForRefresh'))
+    try {
+      return await refreshLibrary({ api, metadata, library, settings: getSettings }, (p) => send('library:refreshProgress', p))
+    } finally {
+      refreshing = false
+      library.flush()
+      if (!wasPaused) queue.resume()
+    }
+  })
   ipcMain.handle('library:remove', (_e, trackId: unknown, deleteFiles?: boolean) => library.remove(assertId(trackId), !!deleteFiles))
 
   // ---------- Einstellungen ----------
   ipcMain.handle('settings:get', () => getSettings())
+  // ---------- Updates (GitHub-Releases, nur mit Zustimmung) ----------
+  const updates = new UpdateChecker(app.getVersion(), join(userData, 'update.json'), () => getSettings().updateCheck === true)
+  updates.onChange((s) => send('update:state', s))
+  ipcMain.handle('update:state', () => updates.getState())
+  ipcMain.handle('update:check', () => updates.check(true))
+  updates.start()
+
   ipcMain.handle('settings:set', (_e, patch: Partial<Settings>) => {
     const before = getSettings()
     const next = updateSettings(patch ?? {})
     if (next.language !== before.language) applyMainLanguage()
     if (next.discordEnabled !== before.discordEnabled) presence.refresh()
     if (next.concurrency !== before.concurrency) queue.pump()
+    if (next.updateCheck !== before.updateCheck) updates.start() // eingeschaltet → gleich prüfen, ausgeschaltet → stoppen
     return next
   })
   ipcMain.handle('settings:chooseFolder', async () => {

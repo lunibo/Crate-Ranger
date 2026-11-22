@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { releaseCover } from '../lib/api'
@@ -92,11 +92,14 @@ export function PlayerBar() {
       {showQueue && (
         <div className="queue-panel">
           <div className="queue-head">{t('player.queue')}</div>
-          {p.order.slice(p.pos).map((qi, i) => {
+          {p.order.slice(p.pos).map((qi, i, rest) => {
             const qt = p.queue[qi]
+            // Trennzeile vor den kommenden Tracks, die „Endlos hören“ angehängt hat
+            const autoplayStart = qt.autoplay && i > 0 && (i === 1 || !p.queue[rest[i - 1]].autoplay)
             return (
+              <Fragment key={`${qi}-${i}`}>
+              {autoplayStart && <div className="queue-divider">{t('autoplay.queueHeading')}</div>}
               <div
-                key={`${qi}-${i}`}
                 className={`queue-item ${i === 0 ? 'active' : ''}`}
                 role="button"
                 tabIndex={0}
@@ -106,6 +109,7 @@ export function PlayerBar() {
                 <span className="qi-title"><TrackLink trackId={qt.trackId} title={qt.title} version={qt.version} /></span>
                 <span className="qi-artist"><ArtistLinks artists={qt.artists} text={qt.artistsTitle} trackId={qt.trackId} releaseId={qt.releaseId} /></span>
               </div>
+              </Fragment>
             )
           })}
         </div>

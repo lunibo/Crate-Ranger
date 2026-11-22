@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { locale } from '../lib/i18n'
 import { Link } from 'react-router-dom'
-import type { LibraryTrack } from '@shared/types'
+import { stripFeaturing } from '@shared/artists'
+import type { LibraryRefreshProgress, LibraryTrack } from '@shared/types'
 import { FORMAT_LABEL } from '@shared/types'
 import { releaseCover, type TrackLite } from '../lib/api'
 import { fmtBytes } from '../lib/format'
@@ -20,12 +21,17 @@ function libToTrack(t: LibraryTrack): TrackLite {
   }
 }
 
-export function LibraryPage() {
+/** Tab „Heruntergeladen“ in der Downloads-Ansicht. */
+export function LibraryView() {
   const { t } = useTranslation()
   const snap = useLibrary((s) => s.snap)
   const root = useSettings((s) => s.settings?.downloadRoot)
+  const template = useSettings((s) => s.settings?.pathTemplate)
   const [filter, setFilter] = useState('')
   const [busy, setBusy] = useState(false)
+  const [confirmRefresh, setConfirmRefresh] = useState(false)
+  const [progress, setProgress] = useState<LibraryRefreshProgress | null>(null)
+  useEffect(() => window.ss.library.onRefreshProgress(setProgress), [])
 
   const unknown = t('library.unknownArtist')
   const groups = useMemo(() => {
@@ -33,7 +39,8 @@ export function LibraryPage() {
     const byArtist = new Map<string, Map<string, LibraryTrack[]>>()
     for (const tr of Object.values(snap.tracks)) {
       if (f && ![tr.title, tr.artist, tr.releaseTitle, tr.releaseArtist].some((x) => x?.toLowerCase().includes(f))) continue
-      const artist = tr.releaseArtist || tr.artist || unknown
+      // Gruppiert wie die Ordner: „Stonebank feat. EMEL“ landet bei „Stonebank“
+      const artist = stripFeaturing(tr.releaseArtist || tr.artist) || unknown
       if (!byArtist.has(artist)) byArtist.set(artist, new Map())
       const rels = byArtist.get(artist)!
       if (!rels.has(tr.releaseId)) rels.set(tr.releaseId, [])
@@ -67,12 +74,24 @@ export function LibraryPage() {
     }
   }
 
+  const refresh = async (): Promise<void> => {
+    setConfirmRefresh(false)
+    setBusy(true)
+    try {
+      const r = await window.ss.library.refresh()
+      toast('success', t('library.refreshResult', { retagged: r.retagged, moved: r.moved }))
+      if (r.failed) toast('error', t('library.refreshFailed', { count: r.failed, error: r.errors[0]?.error ?? '' }))
+    } catch (e) {
+      toast('error', e instanceof Error ? e.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') : String(e))
+    } finally {
+      setBusy(false)
+      setProgress(null)
+    }
+  }
+
   return (
-    <div className="page">
-      <div className="page-head-row">
-        <h1 className="page-title">{t('nav.library')}</h1>
-        <span className="muted">{t('common.trackCount', { count: all.length, formatted: all.length })} · {t('common.releaseCount', { count: Object.keys(snap.releases).length })} · {fmtBytes(size)}</span>
-      </div>
+    <>
+      <div className="tab-summary muted">{t('common.trackCount', { count: all.length, formatted: all.length })} · {t('common.releaseCount', { count: Object.keys(snap.releases).length })} · {fmtBytes(size)}</div>
       <div className="actions">
         <input className="input" placeholder={t('library.filter')} value={filter} onChange={(e) => setFilter(e.target.value)} />
         <button className="btn btn-secondary" disabled={busy} onClick={() => void run(() => window.ss.library.verify())}>
@@ -81,8 +100,20 @@ export function LibraryPage() {
         <button className="btn btn-secondary" disabled={busy} onClick={() => void run(() => window.ss.library.scan())} title={t('library.scanHint')}>
           <IconFolder size={16} /> {t('library.scan')}
         </button>
+        <button className="btn btn-secondary" disabled={busy || !all.length} onClick={() => setConfirmRefresh(true)} title={t('library.refreshHint')}>
+          <IconRefresh size={16} /> {progress ? t('library.refreshProgress', { done: progress.done, total: progress.total }) : t('library.refresh')}
+        </button>
         {root && <button className="btn btn-ghost" onClick={() => void window.ss.shell.openPath(root)}>{t('library.openFolder')}</button>}
       </div>
+      {confirmRefresh && (
+        <div className="notice confirm">
+          <span>{t('library.refreshConfirm', { count: all.length, template })}</span>
+          <div className="row">
+            <button className="btn btn-primary btn-sm" onClick={() => void refresh()}>{t('library.refreshStart')}</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setConfirmRefresh(false)}>{t('common.cancel')}</button>
+          </div>
+        </div>
+      )}
       {missing > 0 && <div className="notice warn"><IconAlert size={16} /> {t('library.missingNotice', { count: missing })}</div>}
       {!all.length ? (
         <Empty>{t('library.empty')}</Empty>
@@ -132,6 +163,6 @@ export function LibraryPage() {
           </section>
         ))
       )}
-    </div>
+    </>
   )
 }

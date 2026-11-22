@@ -178,7 +178,8 @@
     "retryAt": "Server ausgelastet – nächster Versuch um {{time}}.",
     "retryFailed": "Fehlgeschlagene wiederholen",
     "clearFinished": "Erledigte entfernen",
-    "empty": "Keine Downloads. Starte einen Download über den Download-Button bei Tracks, Releases oder Playlists."
+    "empty": "Keine Downloads. Starte einen Download über den Download-Button bei Tracks, Releases oder Playlists.",
+    "tabQueue": "Warteschlange"
   },
   "jobStatus": {
     "queued": "Wartet",
@@ -311,7 +312,15 @@
     "missingNotice_other": "{{count}} Tracks fehlen auf der Festplatte (verschoben oder gelöscht).",
     "empty": "Noch nichts heruntergeladen. Bereits vorhandene Downloads lassen sich mit „Ordner scannen“ einlesen.",
     "downloadMissing": "Fehlende nachladen",
-    "unknownArtist": "Unbekannt"
+    "unknownArtist": "Unbekannt",
+    "refresh": "Tags & Ordner aktualisieren",
+    "refreshHint": "Liest die Metadaten neu von SoundScout, schreibt die Tags neu und sortiert die Dateien in die aktuelle Ordnerstruktur ein. Lädt nichts herunter – zählt nicht aufs Kontingent.",
+    "refreshConfirm": "Tags aller {{count}} heruntergeladenen Dateien neu schreiben und die Dateien in die aktuelle Ordnerstruktur („{{template}}“) verschieben? Leere alte Ordner werden entfernt, heruntergeladen wird nichts.",
+    "refreshStart": "Jetzt aktualisieren",
+    "refreshProgress": "Aktualisiere… {{done}}/{{total}}",
+    "refreshResult": "{{retagged}} Dateien aktualisiert, {{moved}} verschoben",
+    "refreshFailed_one": "{{count}} Datei konnte nicht aktualisiert werden: {{error}}",
+    "refreshFailed_other": "{{count}} Dateien konnten nicht aktualisiert werden, z.B. {{error}}"
   },
   "settings": {
     "folderChanged": "Download-Ordner geändert. Tipp: „Ordner scannen“ unter „Heruntergeladen“ liest vorhandene Dateien ein.",
@@ -375,7 +384,8 @@
     "restoredPaused": "Offene Downloads aus der letzten Sitzung – zum Fortsetzen auf „Fortsetzen“ klicken.",
     "signInRequired": "Nicht angemeldet – bitte anmelden und dann fortsetzen.",
     "pausedManually": "Manuell pausiert",
-    "retryIn": "{{message}} – neuer Versuch in {{seconds}} s"
+    "retryIn": "{{message}} – neuer Versuch in {{seconds}} s",
+    "pausedForRefresh": "Pausiert, während die Bibliothek aktualisiert wird"
   },
   "discord": {
     "by": "von {{artists}}",
@@ -389,7 +399,10 @@
     "incompleteDownload": "Unvollständiger Download ({{loaded}}/{{total}} Bytes)",
     "invalidSessionValue": "Das sieht nicht wie ein gültiger goldloginz-Wert aus.",
     "sessionRejected": "SoundScout hat die Sitzung nicht akzeptiert (abgelaufen oder falsch kopiert?).",
-    "preRelease": "Pre-Release – Download erst ab Release ({{date}})"
+    "preRelease": "Pre-Release – Download erst ab Release ({{date}})",
+    "refreshRunning": "Die Bibliothek wird bereits aktualisiert.",
+    "refreshBusy": "Es laufen noch Downloads – aktualisiere die Bibliothek, wenn sie fertig sind.",
+    "targetExists": "Unter {{path}} liegt bereits eine andere Datei"
   },
   "report": {
     "showChart": "Diagramm",
@@ -525,5 +538,38 @@
       "next": "Weiter"
     },
     "quoted": "„{{text}}“"
+  },
+  "autoplay": {
+    "settingsTitle": "Wiedergabe",
+    "enable": "Endlos hören",
+    "hint": "Wenn deine Warteschlange, ein Album oder ein einzelner Song zu Ende ist, laufen automatisch ähnliche Tracks weiter. Braucht eine Anmeldung.",
+    "queueHeading": "Endlos hören · ähnliche Tracks",
+    "promptTitle": "Einfach weiterhören?",
+    "promptText": "Deine Musik ist zu Ende. Mit „Endlos hören“ laufen danach automatisch ähnliche Tracks weiter.",
+    "promptYes": "Endlos hören aktivieren",
+    "promptNo": "Nein, danke",
+    "promptHint": "Lässt sich jederzeit in den Einstellungen ändern."
+  },
+  "update": {
+    "settingsTitle": "Updates",
+    "enable": "Beim Start nach neuen Versionen suchen",
+    "hint": "Fragt höchstens alle 6 Stunden die öffentliche Release-Liste auf GitHub ab. Es werden keine Konto- oder Nutzungsdaten übertragen; GitHub sieht dabei – wie bei jedem Abruf – deine IP-Adresse.",
+    "installed": "Installierte Version",
+    "latest": "Neueste Version",
+    "checkNow": "Jetzt prüfen",
+    "checking": "Prüfe…",
+    "upToDate": "Du hast die neueste Version.",
+    "availableShort": "Update verfügbar: {{version}}",
+    "failed": "Prüfung fehlgeschlagen ({{error}})",
+    "checkedAt": "zuletzt geprüft {{date}}",
+    "download": "Zum Download",
+    "later": "Später",
+    "availableTitle": "Version {{version}} ist da",
+    "availableText": "Du nutzt noch {{current}}. Die neue Version kannst du auf GitHub herunterladen.",
+    "consentTitle": "Nach Updates suchen?",
+    "consentText": "Crate Ranger kann beim Start auf GitHub nachsehen, ob es eine neue Version gibt. Dabei wird nur die öffentliche Release-Liste abgerufen – ohne Konto- oder Nutzungsdaten.",
+    "consentYes": "Ja, nach Updates suchen",
+    "consentNo": "Nein",
+    "consentHint": "Lässt sich jederzeit in den Einstellungen ändern."
   }
 }

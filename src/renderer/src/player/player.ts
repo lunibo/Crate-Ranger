@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { errorMessage, releaseCover, type TrackLite } from '../lib/api'
+import { errorMessage, releaseCover, similarTo, toTrack, type TrackLite } from '../lib/api'
 import { localFile, toast, useLibrary, useSettings } from '../lib/stores'
 import { t } from '../lib/i18n'
 import { trackerFinish, trackerSeeked, trackerStart, trackerTime } from './playTracker'
@@ -20,6 +20,9 @@ interface PlayerState {
   shuffle: boolean
   repeat: Repeat
   source: 'stream' | 'local' | null
+  /** einmalige Nachfrage „Endlos hören aktivieren?“ anzeigen */
+  autoplayPrompt: boolean
+  answerAutoplay(enable: boolean): void
   playList(tracks: TrackLite[], startIndex?: number): void
   jumpTo(pos: number): void
   playNext(track: TrackLite): void
@@ -47,11 +50,17 @@ function shuffled(n: number, first: number): number[] {
 }
 
 let loadToken = 0
+/** Position, an der ein wiederhergestellter Track beim ersten Abspielen fortgesetzt wird */
+let resumeAt: { trackId: string; time: number } | null = null
+let pendingSeek: number | null = null
 
 async function load(track: TrackLite, autoplay = true, forceResolve = false): Promise<void> {
   const token = ++loadToken
   if (!forceResolve) trackerFinish('switch') // Neustart/Trackwechsel = neue Wiedergabe; Neuversuch nicht
-  usePlayer.setState({ current: track, loading: true, time: 0, duration: track.duration })
+  const resume = resumeAt?.trackId === track.trackId ? resumeAt.time : 0
+  resumeAt = null
+  pendingSeek = resume > 0 ? resume : null
+  usePlayer.setState({ current: track, loading: true, time: resume, duration: track.duration })
   try {
     const local = localFile(useLibrary.getState().snap, track.trackId)
     let src: string
@@ -85,6 +94,61 @@ function updateMediaSession(t: TrackLite): void {
   })
 }
 
+// ---------- Endlos hören ----------
+
+const AUTOPLAY_BATCH = 10
+let extending: Promise<number> | null = null
+
+/** Gleicher Song unabhängig von der Version („Focus“ = „Focus (Extended Mix)“) – Endlos hören soll neue Songs bringen. */
+const songKey = (title: string, artists: string): string =>
+  `${title.replace(/\s*[([].*$/, '').trim().toLowerCase()}|${artists.trim().toLowerCase()}`
+
+/** Hängt ähnliche Tracks zum letzten Track der Warteschlange an. Liefert die Anzahl neuer Tracks. */
+function extendWithSimilar(): Promise<number> {
+  if (extending) return extending
+  extending = (async () => {
+    const { queue, order } = usePlayer.getState()
+    const seed = queue[order[order.length - 1]]
+    if (!seed) return 0
+    try {
+      const res = await similarTo(seed.trackId, 40)
+      const s = usePlayer.getState()
+      const known = new Set(s.queue.map((x) => x.trackId))
+      const songs = new Set(s.queue.map((x) => songKey(x.title, x.artistsTitle)))
+      const fresh: TrackLite[] = []
+      for (const row of res.Data ?? []) {
+        if (fresh.length >= AUTOPLAY_BATCH) break
+        const key = songKey(row.Title ?? '', row.ArtistsTitle ?? '')
+        // schon in der Warteschlange (inkl. Seed) oder nur eine andere Version eines Songs darin
+        if (known.has(row.TrackID) || songs.has(key)) continue
+        known.add(row.TrackID)
+        songs.add(key)
+        fresh.push({ ...toTrack(row), autoplay: true })
+      }
+      if (!fresh.length) return 0
+      // Warteschlange kann sich inzwischen geändert haben – nur anhängen, wenn der Seed noch das Ende ist
+      if (s.queue[s.order[s.order.length - 1]]?.trackId !== seed.trackId) return 0
+      const start = s.queue.length
+      usePlayer.setState({ queue: [...s.queue, ...fresh], order: [...s.order, ...fresh.map((_, i) => start + i)] })
+      return fresh.length
+    } catch {
+      return 0 // z.B. nicht angemeldet → einfach enden
+    } finally {
+      extending = null
+    }
+  })()
+  return extending
+}
+
+const autoplayOn = (): boolean => useSettings.getState().settings?.autoplay === true
+
+/** Läuft der letzte Track, schon jetzt ähnliche Tracks anhängen (kein Stocken beim Übergang). */
+function prefetchAutoplay(): void {
+  const { order, pos, repeat, queue } = usePlayer.getState()
+  if (!autoplayOn() || repeat !== 'off' || !queue.length) return
+  if (pos >= order.length - 1) void extendWithSimilar()
+}
+
 export const usePlayer = create<PlayerState>((set, get) => ({
   queue: [],
   order: [],
@@ -99,6 +163,19 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   shuffle: false,
   repeat: 'off',
   source: null,
+  autoplayPrompt: false,
+
+  answerAutoplay(enable) {
+    set({ autoplayPrompt: false })
+    void useSettings.getState().update({ autoplay: enable })
+    // Zugestimmt → gleich weiterhören, wo die Wiedergabe gerade geendet hat
+    if (enable) {
+      void extendWithSimilar().then((n) => {
+        const { pos, order, playing } = get()
+        if (n && !playing && pos < order.length - 1) get().next()
+      })
+    }
+  },
 
   playList(tracks, startIndex = 0) {
     if (!tracks.length) return
@@ -147,9 +224,20 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     }
     let np = pos + 1
     if (np >= order.length) {
-      if (repeat === 'all' || !auto) np = 0
+      if (repeat === 'all') np = 0
+      else if (autoplayOn()) {
+        // Ende der Warteschlange → ähnliche Tracks anhängen und weiterspielen
+        set({ loading: true })
+        void extendWithSimilar().then((n) => {
+          if (n) get().next(auto)
+          else set({ playing: false, loading: false })
+        })
+        return
+      } else if (!auto) np = 0
       else {
         set({ playing: false })
+        // Noch nie entschieden → einmal nachfragen, ob „Endlos hören“ aktiviert werden soll
+        if (useSettings.getState().settings?.autoplay === null) set({ autoplayPrompt: true })
         return
       }
     }
@@ -205,6 +293,10 @@ audio.addEventListener('timeupdate', () => {
   usePlayer.setState({ time: audio.currentTime })
   trackerTime(audio.currentTime, !audio.paused, audio.duration)
 })
+audio.addEventListener('loadedmetadata', () => {
+  if (pendingSeek !== null && Number.isFinite(audio.duration) && pendingSeek < audio.duration - 1) audio.currentTime = pendingSeek
+  pendingSeek = null
+})
 audio.addEventListener('durationchange', () => {
   if (Number.isFinite(audio.duration)) usePlayer.setState({ duration: audio.duration })
 })
@@ -238,7 +330,104 @@ function pushPresence(): void {
 
 usePlayer.subscribe((s, prev) => {
   if (s.current?.trackId !== prev.current?.trackId || s.playing !== prev.playing) pushPresence()
+  if (s.pos !== prev.pos || s.order !== prev.order || s.repeat !== prev.repeat) prefetchAutoplay()
+  if (s.queue !== prev.queue || s.order !== prev.order || s.pos !== prev.pos || s.shuffle !== prev.shuffle || s.repeat !== prev.repeat) saveSession()
 })
+useSettings.subscribe((s, prev) => {
+  if (s.settings?.autoplay !== prev.settings?.autoplay) prefetchAutoplay()
+})
+
+// ---------- Wiedergabe über Neustarts merken ----------
+
+const SESSION_KEY = 'crate-ranger.playback.v1'
+const MAX_SAVED_QUEUE = 500
+
+interface SavedSession {
+  queue: TrackLite[]
+  order: number[]
+  pos: number
+  time: number
+  shuffle: boolean
+  repeat: Repeat
+}
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null
+let restoring = false
+
+function writeSession(): void {
+  if (saveTimer) clearTimeout(saveTimer)
+  saveTimer = null
+  if (restoring) return
+  const { queue, order, pos, current, shuffle, repeat } = usePlayer.getState()
+  try {
+    if (!current) return localStorage.removeItem(SESSION_KEY)
+    // Sehr lange Warteschlangen (ganzer Katalog …) nur ab dem aktuellen Track speichern
+    let session: SavedSession
+    if (queue.length <= MAX_SAVED_QUEUE) {
+      session = { queue, order, pos, time: audio.currentTime || usePlayer.getState().time, shuffle, repeat }
+    } else {
+      const rest = order.slice(pos, pos + MAX_SAVED_QUEUE).map((i) => queue[i])
+      session = { queue: rest, order: rest.map((_, i) => i), pos: 0, time: audio.currentTime || usePlayer.getState().time, shuffle, repeat }
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+  } catch {
+    /* Speicher voll/gesperrt – Fortsetzen ist nur ein Komfort */
+  }
+}
+
+function saveSession(): void {
+  if (!saveTimer) saveTimer = setTimeout(writeSession, 500)
+}
+
+function readSession(): SavedSession | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const s = JSON.parse(raw) as SavedSession
+    const valid =
+      Array.isArray(s.queue) && s.queue.length > 0 && Array.isArray(s.order) && s.order.length === s.queue.length &&
+      s.order.every((i) => Number.isInteger(i) && i >= 0 && i < s.queue.length) &&
+      Number.isInteger(s.pos) && s.pos >= 0 && s.pos < s.order.length && s.queue.every((x) => x && typeof x.trackId === 'string')
+    return valid ? s : null
+  } catch {
+    return null
+  }
+}
+
+/** Letzte Wiedergabe wiederherstellen – pausiert an der gespeicherten Stelle, „Play“ hört direkt weiter. */
+function restoreSession(): void {
+  const s = readSession()
+  if (!s) return
+  const current = s.queue[s.order[s.pos]]
+  const time = Math.max(0, Number(s.time) || 0)
+  restoring = true
+  usePlayer.setState({
+    queue: s.queue,
+    order: s.order,
+    pos: s.pos,
+    current,
+    time,
+    duration: current.duration,
+    shuffle: !!s.shuffle,
+    repeat: s.repeat === 'all' || s.repeat === 'one' ? s.repeat : 'off',
+    playing: false
+  })
+  restoring = false
+  resumeAt = { trackId: current.trackId, time }
+  updateMediaSession(current)
+}
+
+// Position regelmäßig und beim Beenden sichern
+let lastTimeSave = 0
+audio.addEventListener('timeupdate', () => {
+  const now = Date.now()
+  if (now - lastTimeSave > 5000) {
+    lastTimeSave = now
+    saveSession()
+  }
+})
+audio.addEventListener('pause', saveSession)
+window.addEventListener('beforeunload', writeSession)
 audio.addEventListener('error', () => {
   // Signierte Stream-URL abgelaufen o.ä. → einmal neu auflösen
   const { current, source } = usePlayer.getState()
@@ -253,6 +442,7 @@ audio.addEventListener('error', () => {
 export function initPlayer(volume: number): void {
   audio.volume = volume
   usePlayer.setState({ volume })
+  restoreSession()
   if ('mediaSession' in navigator) {
     const p = (): PlayerState => usePlayer.getState()
     navigator.mediaSession.setActionHandler('play', () => p().toggle())

@@ -30,6 +30,10 @@
   every track has **similar tracks**.
 - **Player** with queue, shuffle, repeat, seeking, volume and media keys – full-length streams (MP3 320) when signed in,
   downloaded tracks play from disk, even offline.
+- **Pick up where you left off** – queue, track and position are remembered; after a restart, *Play* continues
+  right there.
+- **Autoplay** (Settings → Playback) – when the queue, an album or a single song ends, similar tracks keep playing
+  (skipping other versions of songs you just heard). The first time your music ends, the app asks once.
 - **Everything is a link** – song titles open the track page, artist names the artist, release titles and covers the release.
 - **Hover play** on every cover starts the whole single, EP or album.
 - **Favorites** – heart the current song in the player bar or any track in a list.
@@ -48,7 +52,9 @@
   ISRC, UPC, catalog number, label, brand (Uncaged/Instinct/Silk), copyright, moods, themes, instruments, lyrics,
   explicit flag, Copyright Safe status, cover and SoundScout IDs. SoundScout's non-standard ID3 header is removed
   from FLAC files – the audio stays bit-identical.
-- **Tidy folder layout** (customizable template) plus a `cover.jpg` per release:
+- **Tidy folder layout** (customizable template) plus a `cover.jpg` per release. Featured artists stay out of the
+  folder name (“Stonebank feat. EMEL” → `Stonebank/`) so all of an artist's releases sit together; the album-artist tag
+  keeps the full name:
   ```
   <download folder>/
   └─ Shingo Nakamura/
@@ -57,6 +63,8 @@
         ├─ 02 - Focus (Extended Mix).flac
         └─ cover.jpg
   ```
+- **Update tags & folders** rewrites the tags of all downloads and moves them into the current folder layout –
+  no re-download, so it doesn't touch your quota.
 - **Library** – remembers every download (✓ in all lists, x/y progress per release), detects moved or deleted files,
   re-imports existing downloads via “Scan folder” and offers “Download missing”.
 - **Download quota meter** – “x / 3,000” for the current billing period with reset date and a warning when the queue
@@ -88,7 +96,7 @@ the same computer (Windows named pipe, Linux socket incl. Flatpak/Snap).
 English and German, following your system language or a fixed choice. Adding a language is just adding a JSON file
 (see [Adding a language](#adding-a-language)).
 
-![Settings – language, Discord status and listening statistics](docs/screenshots/settings.png)
+![Settings – language, Autoplay, Discord status and listening statistics](docs/screenshots/settings.png)
 
 ## Download
 
@@ -101,6 +109,11 @@ Get the latest version from the **Releases** page of this repository:
 | Debian / Ubuntu | `crate-ranger_<version>_amd64.deb` – `sudo apt install ./crate-ranger_<version>_amd64.deb` |
 
 The Windows builds are not code-signed, so SmartScreen asks on first start (“More info” → “Run anyway”).
+
+**Update check:** on first start the app asks whether it may look for new versions. If you agree, it fetches the
+public release list of this repository from the GitHub API at most every 6 hours (no account or usage data; GitHub
+sees your IP address as with any request) and points you to the new release – downloading stays up to you.
+It can be switched off in *Settings → Updates*. Forks: set `UPDATE_REPO` in `src/shared/update.ts`.
 
 ## Signing in
 

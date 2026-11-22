@@ -178,7 +178,8 @@
     "retryAt": "Server busy – next attempt at {{time}}.",
     "retryFailed": "Retry failed",
     "clearFinished": "Clear finished",
-    "empty": "No downloads. Start one with the download button on tracks, releases or playlists."
+    "empty": "No downloads. Start one with the download button on tracks, releases or playlists.",
+    "tabQueue": "Queue"
   },
   "jobStatus": {
     "queued": "Waiting",
@@ -311,7 +312,15 @@
     "missingNotice_other": "{{count}} tracks are missing from disk (moved or deleted).",
     "empty": "Nothing downloaded yet. Existing downloads can be imported with “Scan folder”.",
     "downloadMissing": "Download missing",
-    "unknownArtist": "Unknown"
+    "unknownArtist": "Unknown",
+    "refresh": "Update tags & folders",
+    "refreshHint": "Re-reads the metadata from SoundScout, rewrites the tags and moves files into the current folder structure. Downloads nothing – doesn’t count towards your quota.",
+    "refreshConfirm": "Rewrite the tags of all {{count}} downloaded files and move them into the current folder structure (“{{template}}”)? Empty old folders are removed; nothing is downloaded.",
+    "refreshStart": "Update now",
+    "refreshProgress": "Updating… {{done}}/{{total}}",
+    "refreshResult": "{{retagged}} files updated, {{moved}} moved",
+    "refreshFailed_one": "{{count}} file could not be updated: {{error}}",
+    "refreshFailed_other": "{{count}} files could not be updated, e.g. {{error}}"
   },
   "settings": {
     "folderChanged": "Download folder changed. Tip: “Scan folder” under “Downloaded” imports existing files.",
@@ -375,7 +384,8 @@
     "restoredPaused": "Unfinished downloads from your last session – click “Resume” to continue.",
     "signInRequired": "Not signed in – please sign in, then resume.",
     "pausedManually": "Paused manually",
-    "retryIn": "{{message}} – retrying in {{seconds}} s"
+    "retryIn": "{{message}} – retrying in {{seconds}} s",
+    "pausedForRefresh": "Paused while the library is being updated"
   },
   "discord": {
     "by": "by {{artists}}",
@@ -389,7 +399,10 @@
     "incompleteDownload": "Incomplete download ({{loaded}}/{{total}} bytes)",
     "invalidSessionValue": "That doesn't look like a valid goldloginz value.",
     "sessionRejected": "SoundScout didn't accept the session (expired or copied incorrectly?).",
-    "preRelease": "Pre-release – downloads open on release day ({{date}})"
+    "preRelease": "Pre-release – downloads open on release day ({{date}})",
+    "refreshRunning": "The library is already being updated.",
+    "refreshBusy": "Downloads are running – update the library once they have finished.",
+    "targetExists": "A different file already exists at {{path}}"
   },
   "report": {
     "showChart": "Chart",
@@ -525,5 +538,38 @@
       "next": "Next"
     },
     "quoted": "“{{text}}”"
+  },
+  "autoplay": {
+    "settingsTitle": "Playback",
+    "enable": "Autoplay",
+    "hint": "When your queue, an album or a single song ends, similar tracks keep playing automatically. Requires signing in.",
+    "queueHeading": "Autoplay · similar tracks",
+    "promptTitle": "Keep listening?",
+    "promptText": "Your music has ended. With Autoplay, similar tracks keep playing automatically.",
+    "promptYes": "Turn on Autoplay",
+    "promptNo": "No, thanks",
+    "promptHint": "You can change this anytime in the settings."
+  },
+  "update": {
+    "settingsTitle": "Updates",
+    "enable": "Check for new versions on startup",
+    "hint": "Looks up the public release list on GitHub at most every 6 hours. No account or usage data is sent; like any request, GitHub sees your IP address.",
+    "installed": "Installed version",
+    "latest": "Latest version",
+    "checkNow": "Check now",
+    "checking": "Checking…",
+    "upToDate": "You have the latest version.",
+    "availableShort": "Update available: {{version}}",
+    "failed": "Check failed ({{error}})",
+    "checkedAt": "last checked {{date}}",
+    "download": "Download",
+    "later": "Later",
+    "availableTitle": "Version {{version}} is out",
+    "availableText": "You’re on {{current}}. Get the new version on GitHub.",
+    "consentTitle": "Check for updates?",
+    "consentText": "Crate Ranger can look on GitHub at startup to see whether a new version is available. It only fetches the public release list – no account or usage data.",
+    "consentYes": "Yes, check for updates",
+    "consentNo": "No",
+    "consentHint": "You can change this anytime in the settings."
   }
 }

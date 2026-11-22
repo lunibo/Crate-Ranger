@@ -65,7 +65,7 @@ if (process.env.E2E_DOWNLOAD === '1') {
     const lib = await win.evaluate(() => window.ss.library.snapshot())
     log('LIBRARY', { tracks: Object.keys(lib.tracks).length, entry: lib.tracks['53088d3f-f0d7-4c6a-8eed-c5eff39164ae'], release: lib.releases['001b48d9-16d6-4790-a816-9de66a43cd80'] })
     await go('/release/001b48d9-16d6-4790-a816-9de66a43cd80', 3000); await shot('release_status')
-    await go('/library', 2500); await shot('library')
+    await go('/downloads/library', 2500); await shot('library')
   }
 }
 // Lokale Wiedergabe (falls der Track in der Bibliothek ist) inkl. Spulen

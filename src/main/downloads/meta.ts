@@ -1,3 +1,4 @@
+import { stripFeaturing } from '@shared/artists'
 import type { CatalogTrack, ReleaseArtist } from '@shared/types'
 
 /** Normalisierte Metadaten eines Tracks – Grundlage für Dateipfad und Tags. */
@@ -9,6 +10,8 @@ export interface TrackMeta {
   artistsTitle: string
   artists: string[]
   releaseArtist: string
+  /** Release-Artist ohne Featured-Artists („Stonebank feat. EMEL“ → „Stonebank“) – für Ordnernamen */
+  folderArtist: string
   releaseTitle: string
   releaseVersion: string
   releaseType: string
@@ -66,6 +69,32 @@ export function localReleaseDate(iso: string | undefined, timeZone?: string): st
 
 const uniq = (xs: string[]): string[] => [...new Set(xs.map((x) => x.trim()).filter(Boolean))]
 
+/** SoundScout liefert „Dance“ als Obergenre vor dem eigentlichen Genre → das genaue Genre zuerst. */
+const UMBRELLA_GENRES = new Set(['dance'])
+export function orderGenres(genres: string[]): string[] {
+  const list = uniq(genres)
+  const specific = list.filter((g) => !UMBRELLA_GENRES.has(g.toLowerCase()))
+  return [...specific, ...list.filter((g) => UMBRELLA_GENRES.has(g.toLowerCase()))]
+}
+
+/** Release-Artist ohne Featured-Artists, Reihenfolge wie im Anzeigenamen. */
+export function mainArtist(releaseArtist: string, releaseArtists: ReleaseArtist[] = []): string {
+  const stripped = stripFeaturing(releaseArtist)
+  if (stripped && stripped !== releaseArtist.trim()) return stripped
+  // Kein „feat.“ im Namen, aber Featured-Artists bekannt → nur die Hauptartists
+  const featured = releaseArtists.filter((a) => a.Role === 'Featured')
+  const primary = releaseArtists.filter((a) => a.Role === 'Primary').sort((a, b) => a.ArtistNumber - b.ArtistNumber)
+  if (featured.length && primary.length && featured.some((a) => releaseArtist.includes(a.DisplayName))) {
+    return primary.map((a) => a.DisplayName).join(' & ')
+  }
+  return releaseArtist.trim()
+}
+
+/** Einheitliche Zeilenumbrüche (SoundScout liefert teils \r\n), keine Leerzeichen am Zeilenende. */
+export function normalizeLyrics(s: string): string {
+  return s.replace(/\r\n?/g, '\n').replace(/[ \t]+$/gm, '').trim()
+}
+
 export type TagCategoryMap = Record<string, string> // tag (lowercase) → category (moods|usages|instruments|…)
 
 export function buildTrackMeta(
@@ -89,7 +118,7 @@ export function buildTrackMeta(
   }
   const releaseDate = localReleaseDate(t.ReleaseDate, t.ReleaseDateTimezone)
   const year = releaseDate.slice(0, 4)
-  const genres = uniq((t.Genres?.length ? t.Genres : (t.ReleaseGenres ?? [])).map((g) => g.Title))
+  const genres = orderGenres((t.Genres?.length ? t.Genres : (t.ReleaseGenres ?? [])).map((g) => g.Title))
   const artists = t.Artists?.length
     ? uniq(t.Artists.map((a) => a.Name))
     : uniq([t.ArtistsTitle])
@@ -107,6 +136,7 @@ export function buildTrackMeta(
     artistsTitle: t.ArtistsTitle?.trim() ?? '',
     artists,
     releaseArtist: releaseArtist.trim(),
+    folderArtist: mainArtist(releaseArtist, opts.releaseArtists),
     releaseTitle: (t.ReleaseTitle ?? '').trim(),
     releaseVersion: (t.ReleaseVersion ?? '').trim(),
     releaseType: t.ReleaseType ?? '',
@@ -127,7 +157,7 @@ export function buildTrackMeta(
     usages: uniq(usages),
     instruments: uniq(instruments),
     otherTags: uniq(other),
-    lyrics: t.Lyrics ?? '',
+    lyrics: normalizeLyrics(t.Lyrics ?? ''),
     lyricsLanguage: t.LyricsLanguage ?? '',
     explicit: !!t.IsExplicit,
     creatorSafe: !!t.IsCreatorFriendly,

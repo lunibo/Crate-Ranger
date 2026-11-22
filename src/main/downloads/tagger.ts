@@ -21,8 +21,11 @@ export interface CoverImage {
   mimeType: string
 }
 
-/** Felder, die zusätzlich zu den Standard-Tags geschrieben werden (Vorbis-Name → Wert/Werte). */
-export function customFields(m: TrackMeta): Record<string, string[]> {
+/**
+ * Felder, die zusätzlich zu den Standard-Tags geschrieben werden (Vorbis-Name → Wert/Werte).
+ * `keepEmpty`: leere Felder mitliefern, damit sie beim erneuten Taggen aus der Datei entfernt werden.
+ */
+export function customFields(m: TrackMeta, keepEmpty = false): Record<string, string[]> {
   const f: Record<string, string[]> = {
     DATE: m.releaseDate ? [m.releaseDate] : [],
     BPM: m.bpm ? [String(m.bpm)] : [],
@@ -43,7 +46,7 @@ export function customFields(m: TrackMeta): Record<string, string[]> {
     SOUNDSCOUT_TAGS: m.otherTags,
     SOUNDSCOUT_URL: [`https://www.soundscout.com/player/music/${m.trackId}`]
   }
-  for (const k of Object.keys(f)) if (!f[k].length) delete f[k]
+  if (!keepEmpty) for (const k of Object.keys(f)) if (!f[k].length) delete f[k]
   return f
 }
 
@@ -77,7 +80,10 @@ function setStandard(tag: TagFile['tag'], m: TrackMeta): void {
 }
 
 function writeXiph(x: XiphComment, m: TrackMeta): void {
-  for (const [k, v] of Object.entries(customFields(m))) x.setFieldAsStrings(k, ...v)
+  for (const [k, v] of Object.entries(customFields(m, true))) {
+    if (v.length) x.setFieldAsStrings(k, ...v)
+    else x.removeField(k)
+  }
 }
 
 function writeId3(t: Id3v2Tag, m: TrackMeta): void {
@@ -85,20 +91,24 @@ function writeId3(t: Id3v2Tag, m: TrackMeta): void {
   if (m.moods.length) t.setTextFrame(Id3v2FrameIdentifiers.TMOO, m.moods.join('; '))
   if (m.lyricsLanguage) t.setTextFrame(Id3v2FrameIdentifiers.TLAN, m.lyricsLanguage)
   const existing = t.getFramesByClassType<Id3v2UserTextInformationFrame>(Id3v2FrameClassType.UserTextInformationFrame)
-  const fields = customFields(m)
+  const fields = customFields(m, true)
   for (const k of ['DATE', 'BPM', 'MOOD', 'LANGUAGE', 'LABEL']) delete fields[k] // bereits als Standard-Frames
   for (const [desc, values] of Object.entries(fields)) {
     let frame = Id3v2UserTextInformationFrame.findUserTextInformationFrame(existing, desc, false)
+    if (!values.length) {
+      if (frame) t.removeFrame(frame)
+      continue
+    }
     if (!frame) {
       frame = Id3v2UserTextInformationFrame.fromDescription(desc)
       t.addFrame(frame)
     }
     frame.text = values
   }
+  t.removeFrames(Id3v2FrameIdentifiers.USLT)
   if (m.lyrics) {
     const lyr = Id3v2UnsynchronizedLyricsFrame.fromData('', 'eng')
     lyr.text = m.lyrics
-    t.removeFrames(Id3v2FrameIdentifiers.USLT)
     t.addFrame(lyr)
   }
 }

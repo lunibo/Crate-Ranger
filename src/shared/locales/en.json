@@ -1,0 +1,529 @@
+{
+  "meta": {
+    "name": "English",
+    "englishName": "English"
+  },
+  "brand": {
+    "tagline": "for SoundScout",
+    "disclaimer": "Crate Ranger is an unofficial client and is not affiliated with SoundScout, Monstercat or Create Music Group. Downloads are only possible within your own SoundScout plan."
+  },
+  "common": {
+    "retry": "Try again",
+    "close": "Close",
+    "loading": "Loading…",
+    "loadMore": "Load more",
+    "more": "More",
+    "showAll": "Show all",
+    "playAll": "Play all",
+    "open": "Open",
+    "cancel": "Cancel",
+    "noEntries": "Nothing here yet.",
+    "showInExplorer": "Show in Explorer",
+    "trackCount_one": "{{formatted}} track",
+    "trackCount_other": "{{formatted}} tracks",
+    "releaseCount_one": "{{count}} release",
+    "releaseCount_other": "{{count}} releases"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "catalog": "Catalog",
+    "explore": "Explore",
+    "artists": "Artists",
+    "yourMusic": "Your music",
+    "playlists": "Playlists",
+    "favorites": "Favorites",
+    "library": "Downloaded",
+    "downloads": "Downloads",
+    "settings": "Settings",
+    "accountSettings": "Account & settings",
+    "report": "Field Report"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signInNow": "Sign in now",
+    "signingIn": "Signing in…",
+    "signedIn": "Signed in",
+    "signedInAs": "Signed in – {{plan}}",
+    "signedOut": "Signed out",
+    "signOut": "Sign out",
+    "signInFailed": "Sign-in failed"
+  },
+  "login": {
+    "title": "Sign in to SoundScout",
+    "intro": "You sign in directly with SoundScout. This app never stores your password, only the session (valid for 30 days).",
+    "useWindow": "Sign in with the login window",
+    "waiting": "Waiting for sign-in…",
+    "altToggle": "Captcha check failing? Sign in with a browser session",
+    "altStep1": "<open>Open soundscout.com in your browser</open> and sign in as usual.",
+    "altStep2": "Press <kbd>F12</kbd> to open the developer tools → <b>Application</b> (Chrome/Edge) or <b>Storage</b> (Firefox) → <b>Cookies</b> → <code>https://www.soundscout.com</code>.",
+    "altStep3": "Copy the <b>value</b> of the <code>goldloginz</code> entry and paste it here:",
+    "cookiePlaceholder": "goldloginz value",
+    "apply": "Apply",
+    "cookieWarning": "This value is your login – don't share it. The app only keeps it in its own cookie storage."
+  },
+  "home": {
+    "morning": "Good morning",
+    "day": "Good afternoon",
+    "evening": "Good evening",
+    "notSignedIn": "You're not signed in – streams are limited to 30-second previews and downloads are disabled.",
+    "newReleases": "New releases",
+    "popularTracks": "Popular tracks"
+  },
+  "table": {
+    "title": "Title",
+    "release": "Release",
+    "genre": "Genre",
+    "bpm": "BPM",
+    "duration": "Duration"
+  },
+  "status": {
+    "queued": "In the download queue",
+    "downloaded": "Downloaded",
+    "missing": "File missing (moved or deleted)",
+    "progressDownloaded": "{{done}}/{{total}} downloaded"
+  },
+  "trackMenu": {
+    "playNext": "Play next",
+    "addToQueue": "Add to queue",
+    "similar": "Similar tracks",
+    "details": "Track details",
+    "goToRelease": "Go to release",
+    "openOnSoundScout": "Open on SoundScout"
+  },
+  "track": {
+    "kind": "Song",
+    "copyrightSafe": "Copyright Safe",
+    "licenseRequired": "One-off license required",
+    "explicit": "Explicit",
+    "notFound": "Track not found.",
+    "lyrics": "Lyrics",
+    "appearsOn": "Appears on",
+    "categories": {
+      "moods": "Mood",
+      "usages": "Themes",
+      "instruments": "Instruments",
+      "tags": "Tags"
+    },
+    "fields": {
+      "performance": "Type",
+      "isrc": "ISRC",
+      "catalogNumber": "Catalog no.",
+      "label": "Label",
+      "copyright": "Copyright"
+    },
+    "performance": {
+      "Instrumental": "Instrumental",
+      "Vocal": "Vocal"
+    }
+  },
+  "releaseType": {
+    "Single": "Single",
+    "EP": "EP",
+    "Album": "Album",
+    "Compilation": "Compilation"
+  },
+  "favorites": {
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "added": "“{{title}}” added to favorites",
+    "removed": "“{{title}}” removed from favorites",
+    "saveFailed": "Couldn't save favorite: {{error}}",
+    "signInRequired": "Please sign in to SoundScout to use favorites.",
+    "signInToSee": "Please sign in to see your favorites."
+  },
+  "player": {
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next",
+    "previous": "Previous",
+    "shuffle": "Shuffle",
+    "mute": "Mute",
+    "queue": "Queue",
+    "nothingPlaying": "Nothing playing",
+    "sourceLocal": "Local",
+    "sourceStream": "Stream",
+    "repeat": {
+      "off": "Repeat: off",
+      "all": "Repeat: all",
+      "one": "Repeat: one"
+    },
+    "playbackFailed": "Playback failed: {{error}}",
+    "playingNext": "“{{title}}” will play next",
+    "addedToQueue_one": "{{count}} track added to the queue",
+    "addedToQueue_other": "{{count}} tracks added to the queue"
+  },
+  "download": {
+    "download": "Download",
+    "asFormat": "Download as {{format}}",
+    "chooseFormat": "Choose format",
+    "default": "default",
+    "redownload": "Download again",
+    "redownloadOverwrite": "Download again (overwrite existing)",
+    "release": "Download release",
+    "playlist": "Download playlist",
+    "loadedTracks_one": "Download {{count}} loaded track",
+    "loadedTracks_other": "Download {{count}} loaded tracks",
+    "queued_one": "{{count}} track added to the download queue",
+    "queued_other": "{{count}} tracks added to the download queue",
+    "alreadyQueued": "Already in the queue",
+    "signInRequired": "Please sign in to SoundScout to download."
+  },
+  "downloads": {
+    "summary": "{{open}} open · {{done}} done · {{skipped}} skipped · {{errors}} errors",
+    "paused": "Queue paused",
+    "pausedReason": "Queue paused: {{reason}}",
+    "resume": "Resume",
+    "pause": "Pause",
+    "retryAt": "Server busy – next attempt at {{time}}.",
+    "retryFailed": "Retry failed",
+    "clearFinished": "Clear finished",
+    "empty": "No downloads. Start one with the download button on tracks, releases or playlists."
+  },
+  "jobStatus": {
+    "queued": "Waiting",
+    "preparing": "Preparing",
+    "downloading": "Downloading",
+    "tagging": "Tags & cover",
+    "done": "Done",
+    "skipped": "Already present",
+    "error": "Error",
+    "cancelled": "Cancelled"
+  },
+  "quota": {
+    "downloads": "Downloads",
+    "limitReached": "Limit reached",
+    "unlimited": "unlimited",
+    "resetOn": "Resets on {{date}}",
+    "thisPeriod": "Downloads in this billing period",
+    "noLimitKnown": "Downloads (no monthly limit known)",
+    "remaining": "left (estimated)",
+    "serverSaysExhausted": "SoundScout reports: quota used up – “{{message}}”",
+    "explanation": "Estimate: only downloads made with this app in the current billing period are counted. Downloads via the website or other devices are not included. According to SoundScout: monthly plans include {{monthly}} downloads per billing period, annual plans are unlimited.",
+    "queueExceeds_one": "Heads-up: {{count}} download is queued but only about {{remaining}} are left in your quota.",
+    "queueExceeds_other": "Heads-up: {{count}} downloads are queued but only about {{remaining}} are left in your quota.",
+    "skippedDontCount": "Tracks you already have are skipped and don't count."
+  },
+  "artist": {
+    "kind": "Artist",
+    "open": "Open artist",
+    "noPage": "There's no artist page for this name.",
+    "tracksInCatalog_one": "{{count}} track in the catalog",
+    "tracksInCatalog_other": "{{count}} tracks in the catalog",
+    "tabs": {
+      "tracks": "Tracks",
+      "releases": "Releases",
+      "appearsOn": "Appears on"
+    }
+  },
+  "release": {
+    "moreFrom": "More from {{artist}}",
+    "goToArtist": "Go to artist",
+    "play": "Play “{{title}}”",
+    "noTracks": "This release has no playable tracks."
+  },
+  "preRelease": {
+    "badge": "Pre-release",
+    "short": "Pre",
+    "availableFrom": "Pre-release – available from {{date}}",
+    "downloadFrom": "Download from {{date}}",
+    "skipped_one": "{{count}} pre-release track skipped – downloads open on release day ({{date}}).",
+    "skipped_other": "{{count}} pre-release tracks skipped – downloads open on release day ({{date}})."
+  },
+  "playlist": {
+    "kind": "Playlist",
+    "public": "Public",
+    "private": "Private",
+    "followers_one": "{{count}} follower",
+    "followers_other": "{{count}} followers",
+    "mine": "My playlists",
+    "noneOwn": "No playlists of your own yet.",
+    "shared": "Shared with me",
+    "curated": "Curated playlists",
+    "empty": "This playlist is empty.",
+    "loadedDownloaded_one": "{{count}} of the loaded tracks downloaded",
+    "loadedDownloaded_other": "{{count}} of the loaded tracks downloaded"
+  },
+  "similar": {
+    "titleWith": "Similar to <link>“{{title}}”</link>",
+    "titleGeneric": "Similar to this track",
+    "loading": "Finding similar tracks…"
+  },
+  "search": {
+    "placeholder": "Artists, releases, tracks … or describe a sound for AI search",
+    "aiSearch": "AI search",
+    "aiSearchHint": "AI search (Enter)",
+    "aiRunning": "AI search running…",
+    "aiResults_one": "{{count}} AI match",
+    "aiResults_other": "{{count}} AI matches",
+    "noMatchingTracks": "No matching tracks found.",
+    "signInRequired": "SoundScout search requires you to sign in.",
+    "intro": "Type to search by name, or describe a sound (e.g. “driving synthwave for a night drive”) and press Enter for AI search.",
+    "tracks_one": "{{count}} track",
+    "tracks_other": "{{count}} tracks",
+    "noResults": "No results. Try AI search with Enter.",
+    "kinds": {
+      "artist": "Artists",
+      "release": "Releases",
+      "playlist": "Playlists",
+      "genre": "Genres",
+      "mood": "Moods",
+      "theme": "Themes"
+    }
+  },
+  "browse": {
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "popular": "Most popular",
+      "title": "Title A–Z"
+    },
+    "tabs": {
+      "genres": "Genre",
+      "moods": "Mood",
+      "usages": "Theme",
+      "instruments": "Instruments",
+      "type": "Type",
+      "bpm": "BPM"
+    },
+    "onlyCopyrightSafe": "Copyright Safe only",
+    "bpmFrom": "from",
+    "bpmTo": "to",
+    "clearFilters": "Clear all filters",
+    "noTracks": "No tracks match these filters."
+  },
+  "explore": {
+    "tabs": {
+      "genres": "Genres",
+      "moods": "Moods",
+      "usages": "Themes",
+      "instruments": "Instruments"
+    }
+  },
+  "library": {
+    "filter": "Filter library…",
+    "verify": "Check files",
+    "scan": "Scan folder",
+    "scanHint": "Finds files with an embedded SoundScout ID in the download folder",
+    "openFolder": "Open folder",
+    "scanResult": "{{scanned}} files checked, {{added}} newly recognized, {{missing}} missing",
+    "missingNotice_one": "{{count}} track is missing from disk (moved or deleted).",
+    "missingNotice_other": "{{count}} tracks are missing from disk (moved or deleted).",
+    "empty": "Nothing downloaded yet. Existing downloads can be imported with “Scan folder”.",
+    "downloadMissing": "Download missing",
+    "unknownArtist": "Unknown"
+  },
+  "settings": {
+    "folderChanged": "Download folder changed. Tip: “Scan folder” under “Downloaded” imports existing files.",
+    "language": {
+      "title": "Language",
+      "label": "App language",
+      "system": "System language"
+    },
+    "account": {
+      "title": "SoundScout account",
+      "status": "Status",
+      "plan": "Plan",
+      "subscription": "Subscription",
+      "until": "until {{date}}",
+      "downloadsAllowed": "allowed",
+      "downloadsNotIncluded": "not included in your plan",
+      "signInInfo": "You sign in through the official SoundScout window (incl. captcha/2FA). This app never stores your password."
+    },
+    "downloads": {
+      "folder": "Download folder",
+      "change": "Change…",
+      "chooseFolderTitle": "Choose download folder",
+      "defaultFormat": "Default format",
+      "structure": "Folder and file structure",
+      "placeholders": "Placeholders:",
+      "placeholdersHint": "“/” separates folders, empty brackets are removed.",
+      "example": "Example:",
+      "restoreDefault": "Restore default",
+      "concurrency": "Simultaneous downloads",
+      "skipExisting": "Skip tracks that are already downloaded (saves download quota)",
+      "saveCover": "Save cover.jpg in the release folder"
+    },
+    "metadata": {
+      "title": "Metadata",
+      "description": "Embedded in every file: title, artists, album artist, album, track number/total, release date, all genres, BPM, key, ISRC, UPC/barcode, catalog number, label, brand (grouping), copyright, moods, themes, instruments, lyrics, explicit flag, Copyright Safe status, cover and the SoundScout track/release ID (so the library can recognize files)."
+    },
+    "discord": {
+      "title": "Discord status",
+      "enable": "Show what I'm listening to in Discord",
+      "hint": "Requires the Discord desktop app on this computer. Shows title, artist, cover and progress as “Listening to …” – clicking the song, artist or cover opens it on SoundScout. Hidden while paused.",
+      "status": {
+        "disabled": "Off",
+        "connecting": "Connecting to Discord…",
+        "connected": "Connected as {{user}}",
+        "not-running": "Discord not found – retrying automatically",
+        "missing-client-id": "Application ID missing",
+        "error": "Discord rejected the Application ID"
+      }
+    },
+    "stats": {
+      "title": "Listening statistics",
+      "enable": "Collect listening statistics for your Field Report",
+      "hint": "Stored only on this computer: what you play, for how long and when, plus favorites, searches and downloads.",
+      "clear": "Delete statistics",
+      "confirm": "Delete all listening statistics permanently?",
+      "confirmYes": "Delete",
+      "cleared": "Listening statistics deleted"
+    }
+  },
+  "queue": {
+    "restoredPaused": "Unfinished downloads from your last session – click “Resume” to continue.",
+    "signInRequired": "Not signed in – please sign in, then resume.",
+    "pausedManually": "Paused manually",
+    "retryIn": "{{message}} – retrying in {{seconds}} s"
+  },
+  "discord": {
+    "by": "by {{artists}}",
+    "button": "Listen on SoundScout"
+  },
+  "errors": {
+    "trackNotInCatalog": "Track not found in the catalog",
+    "unexpectedStreamUrl": "Unexpected stream URL",
+    "unexpectedDownloadHost": "Unexpected download host: {{host}}",
+    "downloadFailedHttp": "Download failed (HTTP {{status}})",
+    "incompleteDownload": "Incomplete download ({{loaded}}/{{total}} bytes)",
+    "invalidSessionValue": "That doesn't look like a valid goldloginz value.",
+    "sessionRejected": "SoundScout didn't accept the session (expired or copied incorrectly?).",
+    "preRelease": "Pre-release – downloads open on release day ({{date}})"
+  },
+  "report": {
+    "showChart": "Chart",
+    "showTable": "Table",
+    "minutesValue": "{{value}} min",
+    "minutes": "Minutes",
+    "periodYear": "Your {{year}}",
+    "periodLast30": "Your last 30 days",
+    "periodAll": "All time",
+    "last30": "Last 30 days",
+    "all": "All time",
+    "playStory": "Play story",
+    "empty": "No listening data for this period yet – play some music and come back.",
+    "disabled": "Listening statistics are turned off.",
+    "privacy": "All statistics stay local on this computer. They are never uploaded.",
+    "minutesListened": "minutes listened",
+    "minutesEquivalent": "That's {{hours}} hours – or {{days}} days.",
+    "kpi": {
+      "plays": "Plays",
+      "tracks": "Different tracks",
+      "artists": "Artists",
+      "releases": "Releases",
+      "activeDays": "Days with music",
+      "streak": "Longest streak"
+    },
+    "daysValue_one": "{{count}} day",
+    "daysValue_other": "{{count}} days",
+    "hoursValue": "{{value}} h",
+    "playsValue_one": "{{count}} play",
+    "playsValue_other": "{{count}} plays",
+    "personaKicker": "Your ranger type",
+    "persona": {
+      "nightOwl": {
+        "title": "Night Owl Ranger",
+        "text": "Your music comes alive after dark – your peak hour is {{hour}}."
+      },
+      "earlyBird": {
+        "title": "Sunrise Ranger",
+        "text": "You start your day with music – a big part of it before 9 am."
+      },
+      "bassRanger": {
+        "title": "Bass Ranger",
+        "text": "{{genre}} is your terrain – the heavier the drop, the better."
+      },
+      "chillRanger": {
+        "title": "Chill Ranger",
+        "text": "Laid-back is your pace: an average of {{bpm}} BPM."
+      },
+      "speedRanger": {
+        "title": "Speed Ranger",
+        "text": "You like it fast – an average of {{bpm}} BPM."
+      },
+      "explorer": {
+        "title": "Trailblazer",
+        "text": "Always on the lookout: most of your artists were new to you."
+      },
+      "loyal": {
+        "title": "Loyal Ranger",
+        "text": "You know what you like – {{artist}} is your constant companion."
+      },
+      "collector": {
+        "title": "Crate Digger",
+        "text": "Your crate is full – you downloaded more than 100 tracks."
+      },
+      "ranger": {
+        "title": "All-round Ranger",
+        "text": "A little bit of everything – your favorite genre is {{genre}}."
+      }
+    },
+    "topArtists": "Top artists",
+    "topTracks": "Top tracks",
+    "topReleases": "Top releases",
+    "topGenre": "Top genre",
+    "byDay": "Minutes per day",
+    "byMonth": "Minutes per month",
+    "busiestDay": "Busiest day: {{date}} ({{minutes}})",
+    "day": "Day",
+    "month": "Month",
+    "clock": "Listening clock",
+    "peakHour": "Most listened at {{hour}}",
+    "hour": "Hour",
+    "weekdays": "Weekdays",
+    "peakWeekday": "Favorite day: {{day}}",
+    "weekday": "Weekday",
+    "genres": "Genres",
+    "moods": "Moods",
+    "byListeningTime": "Share of listening time",
+    "noMoods": "No mood data yet.",
+    "labels": "Monstercat labels",
+    "labelsSub": "Share of listening time by brand",
+    "label": "Label",
+    "share": "Share",
+    "otherLabels": "Other",
+    "tempo": "Tempo",
+    "avgBpm": "Average {{bpm}} BPM",
+    "eras": "Music eras",
+    "medianYear": "Your music era: {{year}} · {{fresh}} fresh releases (≤ 90 days old)",
+    "releaseYear": "Release year",
+    "discoveries": "Discoveries",
+    "discoveriesSub": "Artists you heard for the first time",
+    "habits": "Listening habits",
+    "habit": {
+      "completion": "Played to the end",
+      "skips": "Skipped (< 30 s)",
+      "creatorSafe": "Copyright Safe",
+      "favorites": "Favorites added",
+      "downloads": "Downloads",
+      "searches": "Searches",
+      "aiSearches_one": "{{count}} of them AI search",
+      "aiSearches_other": "{{count}} of them AI searches",
+      "topSearch": "Top search",
+      "appTime": "Time in app",
+      "sources": "Source of your listening time",
+      "local": "Local files",
+      "stream": "Stream"
+    },
+    "story": {
+      "intro": "Let's look back at what you listened to.",
+      "minutesBefore": "You listened to",
+      "minutesAfter": "minutes of music – that's {{days}} days and {{tracks}} different tracks.",
+      "topArtist": "Your top artist",
+      "topArtistMinutes": "{{minutes}} together",
+      "topTrack": "Your song of the period",
+      "timesPlayed_one": "played {{count}} time",
+      "timesPlayed_other": "played {{count}} times",
+      "clock": "Your favorite time for music",
+      "weekday": "Especially on {{day}}s",
+      "streak_one": "{{count}} day in a row",
+      "streak_other": "{{count}} days in a row",
+      "discover": "You discovered",
+      "discoverAfter": "new artists – including {{names}}.",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "quoted": "“{{text}}”"
+  }
+}

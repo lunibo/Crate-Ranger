@@ -1,0 +1,29 @@
+# Abhängigkeiten & Build
+node_modules/
+out/
+dist/
+*.tsbuildinfo
+coverage/
+
+# Ausgaben der Testskripte (Screenshots können Kontodaten zeigen)
+smoke-out/
+e2e-out/
+i18n-out/
+.playwright-mcp/
+
+# Audio – heruntergeladene/Test-Dateien nie committen
+*.flac
+*.mp3
+*.wav
+*.part
+
+# lokale Konfiguration & Geheimnisse
+.env
+.env.*
+# lokale Werkzeug-Konfiguration (enthält Pfade dieses Rechners)
+.mcp.json
+
+# Logs & Systemdateien
+*.log
+.DS_Store
+Thumbs.db

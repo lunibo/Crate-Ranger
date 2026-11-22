@@ -1,0 +1,529 @@
+{
+  "meta": {
+    "name": "Deutsch",
+    "englishName": "German"
+  },
+  "brand": {
+    "tagline": "für SoundScout",
+    "disclaimer": "Crate Ranger ist ein inoffizieller Client und steht in keiner Verbindung zu SoundScout, Monstercat oder Create Music Group. Downloads sind nur im Rahmen deines eigenen SoundScout-Plans möglich."
+  },
+  "common": {
+    "retry": "Erneut versuchen",
+    "close": "Schließen",
+    "loading": "Lädt…",
+    "loadMore": "Mehr laden",
+    "more": "Mehr",
+    "showAll": "Alle anzeigen",
+    "playAll": "Alle abspielen",
+    "open": "Öffnen",
+    "cancel": "Abbrechen",
+    "noEntries": "Keine Einträge.",
+    "showInExplorer": "Im Explorer anzeigen",
+    "trackCount_one": "{{formatted}} Track",
+    "trackCount_other": "{{formatted}} Tracks",
+    "releaseCount_one": "{{count}} Release",
+    "releaseCount_other": "{{count}} Releases"
+  },
+  "nav": {
+    "home": "Start",
+    "search": "Suche",
+    "catalog": "Katalog",
+    "explore": "Entdecken",
+    "artists": "Artists",
+    "yourMusic": "Deine Musik",
+    "playlists": "Playlists",
+    "favorites": "Favoriten",
+    "library": "Heruntergeladen",
+    "downloads": "Downloads",
+    "settings": "Einstellungen",
+    "accountSettings": "Konto & Einstellungen",
+    "report": "Field Report"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signInNow": "Jetzt anmelden",
+    "signingIn": "Anmeldung läuft…",
+    "signedIn": "Angemeldet",
+    "signedInAs": "Angemeldet – {{plan}}",
+    "signedOut": "Abgemeldet",
+    "signOut": "Abmelden",
+    "signInFailed": "Anmeldung fehlgeschlagen"
+  },
+  "login": {
+    "title": "Bei SoundScout anmelden",
+    "intro": "Die Anmeldung läuft direkt bei SoundScout. Diese App speichert kein Passwort, nur die Sitzung (30 Tage gültig).",
+    "useWindow": "Im Anmeldefenster einloggen",
+    "waiting": "Warte auf Anmeldung…",
+    "altToggle": "Captcha-Prüfung schlägt fehl? Mit Browser-Sitzung anmelden",
+    "altStep1": "<open>soundscout.com im Browser öffnen</open> und dort normal anmelden.",
+    "altStep2": "Mit <kbd>F12</kbd> die Entwicklertools öffnen → <b>Anwendung</b> (Chrome/Edge) bzw. <b>Web-Speicher</b> (Firefox) → <b>Cookies</b> → <code>https://www.soundscout.com</code>.",
+    "altStep3": "Beim Eintrag <code>goldloginz</code> den <b>Wert</b> kopieren und hier einfügen:",
+    "cookiePlaceholder": "goldloginz-Wert",
+    "apply": "Übernehmen",
+    "cookieWarning": "Der Wert ist dein Login – gib ihn nicht weiter. Die App speichert ihn nur in ihrem eigenen Cookie-Speicher."
+  },
+  "home": {
+    "morning": "Guten Morgen",
+    "day": "Guten Tag",
+    "evening": "Guten Abend",
+    "notSignedIn": "Du bist nicht angemeldet – Streams sind auf 30-Sekunden-Vorschauen beschränkt und Downloads deaktiviert.",
+    "newReleases": "Neue Releases",
+    "popularTracks": "Beliebte Tracks"
+  },
+  "table": {
+    "title": "Titel",
+    "release": "Release",
+    "genre": "Genre",
+    "bpm": "BPM",
+    "duration": "Dauer"
+  },
+  "status": {
+    "queued": "In der Download-Warteschlange",
+    "downloaded": "Heruntergeladen",
+    "missing": "Datei fehlt (verschoben/gelöscht)",
+    "progressDownloaded": "{{done}}/{{total}} heruntergeladen"
+  },
+  "trackMenu": {
+    "playNext": "Als Nächstes spielen",
+    "addToQueue": "Zur Warteschlange",
+    "similar": "Ähnliche Tracks",
+    "details": "Track-Details",
+    "goToRelease": "Zum Release",
+    "openOnSoundScout": "Auf SoundScout öffnen"
+  },
+  "track": {
+    "kind": "Song",
+    "copyrightSafe": "Copyright Safe",
+    "licenseRequired": "Einzellizenz nötig",
+    "explicit": "Explicit",
+    "notFound": "Track nicht gefunden.",
+    "lyrics": "Lyrics",
+    "appearsOn": "Erscheint auf",
+    "categories": {
+      "moods": "Stimmung",
+      "usages": "Themen",
+      "instruments": "Instrumente",
+      "tags": "Tags"
+    },
+    "fields": {
+      "performance": "Typ",
+      "isrc": "ISRC",
+      "catalogNumber": "Katalognr.",
+      "label": "Label",
+      "copyright": "Copyright"
+    },
+    "performance": {
+      "Instrumental": "Instrumental",
+      "Vocal": "Gesang"
+    }
+  },
+  "releaseType": {
+    "Single": "Single",
+    "EP": "EP",
+    "Album": "Album",
+    "Compilation": "Compilation"
+  },
+  "favorites": {
+    "add": "Zu Favoriten hinzufügen",
+    "remove": "Aus Favoriten entfernen",
+    "added": "„{{title}}“ zu Favoriten hinzugefügt",
+    "removed": "„{{title}}“ aus Favoriten entfernt",
+    "saveFailed": "Favorit konnte nicht gespeichert werden: {{error}}",
+    "signInRequired": "Für Favoriten bitte bei SoundScout anmelden.",
+    "signInToSee": "Bitte anmelden, um deine Favoriten zu sehen."
+  },
+  "player": {
+    "play": "Abspielen",
+    "pause": "Pause",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "shuffle": "Zufall",
+    "mute": "Stumm",
+    "queue": "Warteschlange",
+    "nothingPlaying": "Nichts wird abgespielt",
+    "sourceLocal": "Lokal",
+    "sourceStream": "Stream",
+    "repeat": {
+      "off": "Wiederholen: aus",
+      "all": "Wiederholen: alle",
+      "one": "Wiederholen: einen"
+    },
+    "playbackFailed": "Wiedergabe fehlgeschlagen: {{error}}",
+    "playingNext": "„{{title}}“ wird als Nächstes gespielt",
+    "addedToQueue_one": "{{count}} Track zur Warteschlange hinzugefügt",
+    "addedToQueue_other": "{{count}} Tracks zur Warteschlange hinzugefügt"
+  },
+  "download": {
+    "download": "Herunterladen",
+    "asFormat": "Als {{format}} herunterladen",
+    "chooseFormat": "Format wählen",
+    "default": "Standard",
+    "redownload": "Erneut herunterladen",
+    "redownloadOverwrite": "Erneut laden (vorhandene überschreiben)",
+    "release": "Release herunterladen",
+    "playlist": "Playlist herunterladen",
+    "loadedTracks_one": "{{count}} geladenen Track herunterladen",
+    "loadedTracks_other": "{{count}} geladene Tracks herunterladen",
+    "queued_one": "{{count}} Track zur Download-Warteschlange hinzugefügt",
+    "queued_other": "{{count}} Tracks zur Download-Warteschlange hinzugefügt",
+    "alreadyQueued": "Bereits in der Warteschlange",
+    "signInRequired": "Zum Herunterladen bitte zuerst bei SoundScout anmelden."
+  },
+  "downloads": {
+    "summary": "{{open}} offen · {{done}} fertig · {{skipped}} übersprungen · {{errors}} Fehler",
+    "paused": "Warteschlange pausiert",
+    "pausedReason": "Warteschlange pausiert: {{reason}}",
+    "resume": "Fortsetzen",
+    "pause": "Pausieren",
+    "retryAt": "Server ausgelastet – nächster Versuch um {{time}}.",
+    "retryFailed": "Fehlgeschlagene wiederholen",
+    "clearFinished": "Erledigte entfernen",
+    "empty": "Keine Downloads. Starte einen Download über den Download-Button bei Tracks, Releases oder Playlists."
+  },
+  "jobStatus": {
+    "queued": "Wartet",
+    "preparing": "Vorbereitung",
+    "downloading": "Lädt",
+    "tagging": "Tags & Cover",
+    "done": "Fertig",
+    "skipped": "Bereits vorhanden",
+    "error": "Fehler",
+    "cancelled": "Abgebrochen"
+  },
+  "quota": {
+    "downloads": "Downloads",
+    "limitReached": "Limit erreicht",
+    "unlimited": "unbegrenzt",
+    "resetOn": "Reset am {{date}}",
+    "thisPeriod": "Downloads in diesem Abrechnungszeitraum",
+    "noLimitKnown": "Downloads (kein Monatslimit bekannt)",
+    "remaining": "übrig (geschätzt)",
+    "serverSaysExhausted": "SoundScout meldet: Kontingent aufgebraucht – „{{message}}“",
+    "explanation": "Schätzung: Gezählt werden nur Downloads dieser App im aktuellen Abrechnungszeitraum. Downloads über die Website oder andere Geräte sind nicht enthalten. Laut SoundScout: Monatspläne {{monthly}} Downloads pro Abrechnungszeitraum, Jahrespläne unbegrenzt.",
+    "queueExceeds_one": "Achtung: {{count}} Download in der Warteschlange, aber nur noch ca. {{remaining}} im Kontingent.",
+    "queueExceeds_other": "Achtung: {{count}} Downloads in der Warteschlange, aber nur noch ca. {{remaining}} im Kontingent.",
+    "skippedDontCount": "Bereits vorhandene Tracks werden übersprungen und zählen nicht."
+  },
+  "artist": {
+    "kind": "Artist",
+    "open": "Artist öffnen",
+    "noPage": "Zu diesem Namen ist keine Artist-Seite hinterlegt.",
+    "tracksInCatalog_one": "{{count}} Track im Katalog",
+    "tracksInCatalog_other": "{{count}} Tracks im Katalog",
+    "tabs": {
+      "tracks": "Tracks",
+      "releases": "Releases",
+      "appearsOn": "Vertreten auf"
+    }
+  },
+  "release": {
+    "moreFrom": "Mehr von {{artist}}",
+    "goToArtist": "Zum Artist",
+    "play": "„{{title}}“ abspielen",
+    "noTracks": "Dieses Release hat keine abspielbaren Tracks."
+  },
+  "preRelease": {
+    "badge": "Pre-Release",
+    "short": "Pre",
+    "availableFrom": "Pre-Release – verfügbar ab {{date}}",
+    "downloadFrom": "Download ab {{date}}",
+    "skipped_one": "{{count}} Pre-Release-Track übersprungen – Download erst ab Release ({{date}}).",
+    "skipped_other": "{{count}} Pre-Release-Tracks übersprungen – Download erst ab Release ({{date}})."
+  },
+  "playlist": {
+    "kind": "Playlist",
+    "public": "Öffentlich",
+    "private": "Privat",
+    "followers_one": "{{count}} Follower",
+    "followers_other": "{{count}} Follower",
+    "mine": "Meine Playlists",
+    "noneOwn": "Noch keine eigenen Playlists.",
+    "shared": "Mit mir geteilt",
+    "curated": "Kuratierte Playlists",
+    "empty": "Diese Playlist ist leer.",
+    "loadedDownloaded_one": "{{count}} der geladenen Tracks heruntergeladen",
+    "loadedDownloaded_other": "{{count}} der geladenen Tracks heruntergeladen"
+  },
+  "similar": {
+    "titleWith": "Ähnlich wie <link>„{{title}}“</link>",
+    "titleGeneric": "Ähnlich wie dieser Track",
+    "loading": "Suche ähnliche Tracks…"
+  },
+  "search": {
+    "placeholder": "Artists, Releases, Tracks … oder beschreibe einen Sound für die KI-Suche",
+    "aiSearch": "KI-Suche",
+    "aiSearchHint": "KI-Suche (Enter)",
+    "aiRunning": "KI-Suche läuft…",
+    "aiResults_one": "{{count}} KI-Treffer",
+    "aiResults_other": "{{count}} KI-Treffer",
+    "noMatchingTracks": "Keine passenden Tracks gefunden.",
+    "signInRequired": "Die Suche von SoundScout erfordert eine Anmeldung.",
+    "intro": "Tippe, um nach Namen zu suchen, oder beschreibe einen Sound (z. B. „treibender Synthwave für eine Nachtfahrt“) und drücke Enter für die KI-Suche.",
+    "tracks_one": "{{count}} Track",
+    "tracks_other": "{{count}} Tracks",
+    "noResults": "Keine Treffer. Probiere die KI-Suche mit Enter.",
+    "kinds": {
+      "artist": "Artists",
+      "release": "Releases",
+      "playlist": "Playlists",
+      "genre": "Genres",
+      "mood": "Stimmungen",
+      "theme": "Themen"
+    }
+  },
+  "browse": {
+    "sort": {
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst",
+      "popular": "Beliebteste",
+      "title": "Titel A–Z"
+    },
+    "tabs": {
+      "genres": "Genre",
+      "moods": "Stimmung",
+      "usages": "Thema",
+      "instruments": "Instrumente",
+      "type": "Typ",
+      "bpm": "BPM"
+    },
+    "onlyCopyrightSafe": "Nur Copyright Safe",
+    "bpmFrom": "von",
+    "bpmTo": "bis",
+    "clearFilters": "Alle Filter löschen",
+    "noTracks": "Keine Tracks für diese Filter."
+  },
+  "explore": {
+    "tabs": {
+      "genres": "Genres",
+      "moods": "Stimmungen",
+      "usages": "Themen",
+      "instruments": "Instrumente"
+    }
+  },
+  "library": {
+    "filter": "Bibliothek filtern…",
+    "verify": "Dateien prüfen",
+    "scan": "Ordner scannen",
+    "scanHint": "Findet Dateien mit eingebetteter SoundScout-ID im Download-Ordner",
+    "openFolder": "Ordner öffnen",
+    "scanResult": "{{scanned}} Dateien geprüft, {{added}} neu erkannt, {{missing}} fehlen",
+    "missingNotice_one": "{{count}} Track fehlt auf der Festplatte (verschoben oder gelöscht).",
+    "missingNotice_other": "{{count}} Tracks fehlen auf der Festplatte (verschoben oder gelöscht).",
+    "empty": "Noch nichts heruntergeladen. Bereits vorhandene Downloads lassen sich mit „Ordner scannen“ einlesen.",
+    "downloadMissing": "Fehlende nachladen",
+    "unknownArtist": "Unbekannt"
+  },
+  "settings": {
+    "folderChanged": "Download-Ordner geändert. Tipp: „Ordner scannen“ unter „Heruntergeladen“ liest vorhandene Dateien ein.",
+    "language": {
+      "title": "Sprache",
+      "label": "Sprache der App",
+      "system": "Systemsprache"
+    },
+    "account": {
+      "title": "SoundScout-Konto",
+      "status": "Status",
+      "plan": "Plan",
+      "subscription": "Abo",
+      "until": "bis {{date}}",
+      "downloadsAllowed": "erlaubt",
+      "downloadsNotIncluded": "nicht im Plan enthalten",
+      "signInInfo": "Die Anmeldung erfolgt im offiziellen SoundScout-Fenster (inkl. Captcha/2FA). Das Passwort wird von dieser App nicht gespeichert."
+    },
+    "downloads": {
+      "folder": "Download-Ordner",
+      "change": "Ändern…",
+      "chooseFolderTitle": "Download-Ordner wählen",
+      "defaultFormat": "Standardformat",
+      "structure": "Ordner- und Dateistruktur",
+      "placeholders": "Platzhalter:",
+      "placeholdersHint": "„/“ trennt Ordner, leere Klammern werden entfernt.",
+      "example": "Beispiel:",
+      "restoreDefault": "Standard wiederherstellen",
+      "concurrency": "Gleichzeitige Downloads",
+      "skipExisting": "Bereits heruntergeladene Tracks überspringen (spart Download-Kontingent)",
+      "saveCover": "cover.jpg im Release-Ordner ablegen"
+    },
+    "metadata": {
+      "title": "Metadaten",
+      "description": "In jede Datei werden eingebettet: Titel, Artists, Album-Artist, Album, Tracknummer/-anzahl, Release-Datum, alle Genres, BPM, Tonart, ISRC, UPC/Barcode, Katalognummer, Label, Brand (Grouping), Copyright, Stimmungen, Themen, Instrumente, Lyrics, Explicit-Flag, Copyright-Safe-Status, Cover sowie die SoundScout-Track-/Release-ID (damit die Bibliothek Dateien wiedererkennt)."
+    },
+    "discord": {
+      "title": "Discord-Status",
+      "enable": "In Discord anzeigen, was ich höre",
+      "hint": "Benötigt die Discord-Desktop-App auf diesem Rechner. Zeigt Titel, Artist, Cover und Fortschritt als „Hört …“ – ein Klick auf Song, Artist oder Cover öffnet ihn auf SoundScout. Bei Pause ausgeblendet.",
+      "status": {
+        "disabled": "Aus",
+        "connecting": "Verbinde mit Discord…",
+        "connected": "Verbunden als {{user}}",
+        "not-running": "Discord nicht gefunden – neuer Versuch automatisch",
+        "missing-client-id": "Application-ID fehlt",
+        "error": "Discord hat die Application-ID abgelehnt"
+      }
+    },
+    "stats": {
+      "title": "Hörstatistik",
+      "enable": "Hörstatistik für den Field Report sammeln",
+      "hint": "Wird nur auf diesem Rechner gespeichert: was du wann wie lange hörst, dazu Favoriten, Suchen und Downloads.",
+      "clear": "Statistik löschen",
+      "confirm": "Alle Hörstatistiken endgültig löschen?",
+      "confirmYes": "Löschen",
+      "cleared": "Hörstatistik gelöscht"
+    }
+  },
+  "queue": {
+    "restoredPaused": "Offene Downloads aus der letzten Sitzung – zum Fortsetzen auf „Fortsetzen“ klicken.",
+    "signInRequired": "Nicht angemeldet – bitte anmelden und dann fortsetzen.",
+    "pausedManually": "Manuell pausiert",
+    "retryIn": "{{message}} – neuer Versuch in {{seconds}} s"
+  },
+  "discord": {
+    "by": "von {{artists}}",
+    "button": "Auf SoundScout anhören"
+  },
+  "errors": {
+    "trackNotInCatalog": "Track nicht im Katalog gefunden",
+    "unexpectedStreamUrl": "Unerwartete Stream-URL",
+    "unexpectedDownloadHost": "Unerwarteter Download-Host: {{host}}",
+    "downloadFailedHttp": "Download fehlgeschlagen (HTTP {{status}})",
+    "incompleteDownload": "Unvollständiger Download ({{loaded}}/{{total}} Bytes)",
+    "invalidSessionValue": "Das sieht nicht wie ein gültiger goldloginz-Wert aus.",
+    "sessionRejected": "SoundScout hat die Sitzung nicht akzeptiert (abgelaufen oder falsch kopiert?).",
+    "preRelease": "Pre-Release – Download erst ab Release ({{date}})"
+  },
+  "report": {
+    "showChart": "Diagramm",
+    "showTable": "Tabelle",
+    "minutesValue": "{{value}} Min.",
+    "minutes": "Minuten",
+    "periodYear": "Dein {{year}}",
+    "periodLast30": "Deine letzten 30 Tage",
+    "periodAll": "Seit Beginn",
+    "last30": "Letzte 30 Tage",
+    "all": "Gesamt",
+    "playStory": "Story abspielen",
+    "empty": "Für diesen Zeitraum gibt es noch keine Hördaten – hör etwas Musik und schau dann wieder vorbei.",
+    "disabled": "Die Hörstatistik ist ausgeschaltet.",
+    "privacy": "Alle Statistiken bleiben lokal auf diesem Rechner und werden nie hochgeladen.",
+    "minutesListened": "Minuten gehört",
+    "minutesEquivalent": "Das sind {{hours}} Stunden – oder {{days}} Tage.",
+    "kpi": {
+      "plays": "Wiedergaben",
+      "tracks": "Verschiedene Tracks",
+      "artists": "Artists",
+      "releases": "Releases",
+      "activeDays": "Tage mit Musik",
+      "streak": "Längste Serie"
+    },
+    "daysValue_one": "{{count}} Tag",
+    "daysValue_other": "{{count}} Tage",
+    "hoursValue": "{{value}} Std.",
+    "playsValue_one": "{{count}} Wiedergabe",
+    "playsValue_other": "{{count}} Wiedergaben",
+    "personaKicker": "Dein Ranger-Typ",
+    "persona": {
+      "nightOwl": {
+        "title": "Nachteulen-Ranger",
+        "text": "Deine Musik erwacht nach Einbruch der Dunkelheit – am meisten hörst du um {{hour}}."
+      },
+      "earlyBird": {
+        "title": "Frühaufsteher-Ranger",
+        "text": "Du startest mit Musik in den Tag – ein großer Teil davon vor 9 Uhr."
+      },
+      "bassRanger": {
+        "title": "Bass-Ranger",
+        "text": "{{genre}} ist dein Revier – je härter der Drop, desto besser."
+      },
+      "chillRanger": {
+        "title": "Chill-Ranger",
+        "text": "Entspannt ist dein Tempo: im Schnitt {{bpm}} BPM."
+      },
+      "speedRanger": {
+        "title": "Speed-Ranger",
+        "text": "Du magst es schnell – im Schnitt {{bpm}} BPM."
+      },
+      "explorer": {
+        "title": "Pfadfinder",
+        "text": "Immer auf Entdeckungstour: Die meisten deiner Artists waren neu für dich."
+      },
+      "loyal": {
+        "title": "Treuer Ranger",
+        "text": "Du weißt, was du magst – {{artist}} begleitet dich ständig."
+      },
+      "collector": {
+        "title": "Plattenkisten-Gräber",
+        "text": "Deine Kiste ist voll – du hast mehr als 100 Tracks heruntergeladen."
+      },
+      "ranger": {
+        "title": "Allround-Ranger",
+        "text": "Von allem etwas – dein Lieblingsgenre ist {{genre}}."
+      }
+    },
+    "topArtists": "Top-Artists",
+    "topTracks": "Top-Tracks",
+    "topReleases": "Top-Releases",
+    "topGenre": "Top-Genre",
+    "byDay": "Minuten pro Tag",
+    "byMonth": "Minuten pro Monat",
+    "busiestDay": "Stärkster Tag: {{date}} ({{minutes}})",
+    "day": "Tag",
+    "month": "Monat",
+    "clock": "Hör-Uhr",
+    "peakHour": "Am meisten um {{hour}}",
+    "hour": "Stunde",
+    "weekdays": "Wochentage",
+    "peakWeekday": "Lieblingstag: {{day}}",
+    "weekday": "Wochentag",
+    "genres": "Genres",
+    "moods": "Stimmungen",
+    "byListeningTime": "Anteil an der Hörzeit",
+    "noMoods": "Noch keine Stimmungsdaten.",
+    "labels": "Monstercat-Labels",
+    "labelsSub": "Anteil an der Hörzeit nach Label",
+    "label": "Label",
+    "share": "Anteil",
+    "otherLabels": "Sonstige",
+    "tempo": "Tempo",
+    "avgBpm": "Im Schnitt {{bpm}} BPM",
+    "eras": "Musik-Ären",
+    "medianYear": "Deine Musik-Ära: {{year}} · {{fresh}} frische Releases (≤ 90 Tage alt)",
+    "releaseYear": "Release-Jahr",
+    "discoveries": "Entdeckungen",
+    "discoveriesSub": "Artists, die du zum ersten Mal gehört hast",
+    "habits": "Hörgewohnheiten",
+    "habit": {
+      "completion": "Bis zum Ende gehört",
+      "skips": "Übersprungen (< 30 s)",
+      "creatorSafe": "Copyright Safe",
+      "favorites": "Neue Favoriten",
+      "downloads": "Downloads",
+      "searches": "Suchen",
+      "aiSearches_one": "davon {{count}} KI-Suche",
+      "aiSearches_other": "davon {{count}} KI-Suchen",
+      "topSearch": "Häufigste Suche",
+      "appTime": "Zeit in der App",
+      "sources": "Woher deine Hörzeit kommt",
+      "local": "Lokale Dateien",
+      "stream": "Stream"
+    },
+    "story": {
+      "intro": "Lass uns zurückblicken, was du gehört hast.",
+      "minutesBefore": "Du hast",
+      "minutesAfter": "Minuten Musik gehört – das sind {{days}} Tage und {{tracks}} verschiedene Tracks.",
+      "topArtist": "Dein Top-Artist",
+      "topArtistMinutes": "{{minutes}} zusammen",
+      "topTrack": "Dein Song des Zeitraums",
+      "timesPlayed_one": "{{count}}-mal gehört",
+      "timesPlayed_other": "{{count}}-mal gehört",
+      "clock": "Deine Lieblingszeit für Musik",
+      "weekday": "Besonders an {{day}}en",
+      "streak_one": "{{count}} Tag am Stück",
+      "streak_other": "{{count}} Tage am Stück",
+      "discover": "Du hast",
+      "discoverAfter": "neue Artists entdeckt – darunter {{names}}.",
+      "prev": "Zurück",
+      "next": "Weiter"
+    },
+    "quoted": "„{{text}}“"
+  }
+}

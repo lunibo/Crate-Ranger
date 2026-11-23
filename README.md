@@ -124,15 +124,6 @@ stores your password, only the session (valid for 30 days). If the captcha check
 Without signing in you can browse the catalog and listen to 30-second previews; full streams, search, playlists,
 favorites and downloads need an account (downloads a paid plan).
 
-## Discord setup
-
-Rich Presence needs a Discord application – its name is shown as “Listening to <name>”. Crate Ranger ships with a
-built-in application, so users only need the switch in the settings.
-
-If you fork the project and want your own application: create a **New Application** in the
-[Discord Developer Portal](https://discord.com/developers/applications) (e.g. named **SoundScout**), copy its
-**Application ID** and set it as `DEFAULT_DISCORD_CLIENT_ID` in `src/shared/discord.ts`. The ID is public, not a secret.
-
 ## Adding a language
 
 1. Copy `src/shared/locales/en.json` to e.g. `src/shared/locales/fr.json`.

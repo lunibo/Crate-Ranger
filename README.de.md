@@ -75,16 +75,6 @@ geändert werden. Technik: [i18next](https://www.i18next.com) / react-i18next, g
 und Hauptprozess (`src/shared/i18n.ts`), typsichere Schlüssel mit `en.json` als Referenz (`src/shared/i18next.d.ts`).
 In die Audiodateien geschriebene Metadaten (z. B. der Kommentar) bleiben bewusst sprachunabhängig auf Englisch.
 
-## Discord-Status einrichten
-
-Discord Rich Presence braucht eine Discord-Application – deren Name erscheint im Status als „Hört <Name>“.
-Crate Ranger bringt eine fest hinterlegte Application mit; Nutzer brauchen nur den Schalter in den Einstellungen.
-
-Wer das Projekt forkt und eine eigene Application nutzen möchte: im
-[Discord Developer Portal](https://discord.com/developers/applications) „New Application“ anlegen (z. B. **SoundScout**),
-die **Application ID** kopieren und in `src/shared/discord.ts` als `DEFAULT_DISCORD_CLIENT_ID` eintragen.
-Die ID ist öffentlich und kein Geheimnis.
-
 ## Ordnerstruktur
 
 Standard (in den Einstellungen änderbar):

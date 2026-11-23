@@ -44,8 +44,17 @@ interface PlayerState {
   cycleRepeat(): void
 }
 
-const audio = new Audio()
-audio.preload = 'auto'
+// Zwei Audio-Elemente: das aktive spielt, das zweite lädt kurz vor Ende den nächsten Track vor.
+// Beim Wechsel werden sie getauscht → kein Warten auf URL-Auflösung und Puffern.
+const elements = [new Audio(), new Audio()]
+for (const el of elements) el.preload = 'auto'
+let audio = elements[0]
+let standby = elements[1]
+
+/** Event-Listener auf beiden Elementen, der nur für das gerade aktive feuert */
+function onAudio<K extends keyof HTMLMediaElementEventMap>(type: K, fn: (e: HTMLMediaElementEventMap[K]) => void): void {
+  for (const el of elements) el.addEventListener(type, (e) => { if (el === audio) fn(e) })
+}
 
 function shuffled(n: number, first: number): number[] {
   const rest = [...Array(n).keys()].filter((i) => i !== first)
@@ -68,6 +77,28 @@ async function load(track: TrackLite, autoplay = true, forceResolve = false): Pr
   resumeAt = null
   pendingSeek = resume > 0 ? resume : null
   usePlayer.setState({ current: track, loading: true, time: resume, duration: track.duration })
+  // Vorgeladen? → Elemente tauschen und sofort weiterspielen
+  if (!forceResolve && !resume && standby.dataset.trackId === track.trackId && standby.src && !standby.error) {
+    const prev = audio
+    audio = standby
+    standby = prev
+    audio.volume = prev.volume
+    audio.muted = prev.muted
+    resetStandby()
+    prev.pause()
+    usePlayer.setState({ source: audio.dataset.source === 'local' ? 'local' : 'stream', loading: audio.readyState < 3 })
+    if (Number.isFinite(audio.duration)) usePlayer.setState({ duration: audio.duration })
+    if (audio.currentTime) audio.currentTime = 0
+    try {
+      if (autoplay) await audio.play()
+      updateMediaSession(track)
+    } catch (e) {
+      if (token !== loadToken) return
+      usePlayer.setState({ loading: false, playing: false })
+      toast('error', t('player.playbackFailed', { error: errorMessage(e) }))
+    }
+    return
+  }
   try {
     const local = localFile(useLibrary.getState().snap, track.trackId)
     let src: string
@@ -81,6 +112,8 @@ async function load(track: TrackLite, autoplay = true, forceResolve = false): Pr
     }
     if (token !== loadToken) return
     audio.src = src
+    audio.dataset.trackId = track.trackId
+    audio.dataset.source = source
     usePlayer.setState({ source })
     if (autoplay) await audio.play()
     updateMediaSession(track)
@@ -99,6 +132,61 @@ function updateMediaSession(t: TrackLite): void {
     album: t.releaseTitle,
     artwork: [{ src: releaseCover(t.releaseId, 512), sizes: '512x512', type: 'image/webp' }]
   })
+}
+
+// ---------- Nächsten Track vorladen ----------
+
+/** Ab dieser Restzeit (s) wird der nächste Track ins zweite Audio-Element geladen */
+const PRELOAD_AUDIO_BEFORE_END = 30
+let urlResolvedFor: string | null = null
+let preloadToken = 0
+
+function resetStandby(): void {
+  preloadToken++
+  standby.removeAttribute('src')
+  delete standby.dataset.trackId
+  delete standby.dataset.source
+  standby.load() // bricht laufendes Puffern ab
+}
+
+/** Track, der nach dem aktuellen automatisch kommt (ohne „Endlos hören“-Nachladen) */
+function upcomingTrack(): TrackLite | null {
+  const { order, pos, queue, repeat } = usePlayer.getState()
+  if (!queue.length || repeat === 'one') return null
+  if (pos + 1 < order.length) return queue[order[pos + 1]]
+  return repeat === 'all' ? queue[order[0]] : null
+}
+
+/**
+ * Stufe 1: sobald ein Track läuft, die Stream-URL des nächsten auflösen (Hauptprozess cacht sie 24 h).
+ * Stufe 2: kurz vor Ende den Anfang des nächsten Tracks im zweiten Element puffern.
+ * Erst so spät, damit beim Überspringen kaum Daten umsonst geladen werden.
+ */
+function preloadNext(): void {
+  const { current, playing } = usePlayer.getState()
+  const next = upcomingTrack()
+  if (!current || !next || next.trackId === current.trackId) return
+  const local = localFile(useLibrary.getState().snap, next.trackId)
+  if (!local && urlResolvedFor !== next.trackId) {
+    urlResolvedFor = next.trackId
+    void window.ss.player.resolve(next.trackId).catch(() => (urlResolvedFor = null))
+  }
+  if (!playing || standby.dataset.trackId === next.trackId) return
+  const total = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : current.duration
+  if (!total || total - audio.currentTime > PRELOAD_AUDIO_BEFORE_END) return
+  const token = ++preloadToken
+  standby.dataset.trackId = next.trackId
+  void (async () => {
+    try {
+      const src = local ? window.ss.player.localUrl(local) : await window.ss.player.resolve(next.trackId)
+      if (token !== preloadToken) return
+      standby.dataset.source = local ? 'local' : 'stream'
+      standby.src = src
+      standby.load()
+    } catch {
+      if (token === preloadToken) delete standby.dataset.trackId
+    }
+  })()
 }
 
 // ---------- Endlos hören ----------
@@ -303,30 +391,31 @@ export const usePlayer = create<PlayerState>((set, get) => ({
   }
 }))
 
-audio.addEventListener('playing', () => {
+onAudio('playing', () => {
   usePlayer.setState({ playing: true, loading: false })
   const { current, source } = usePlayer.getState()
   if (current) trackerStart(current, source ?? 'stream', audio.currentTime, audio.duration)
 })
-audio.addEventListener('pause', () => usePlayer.setState({ playing: false }))
-audio.addEventListener('waiting', () => usePlayer.setState({ loading: true }))
-audio.addEventListener('canplay', () => usePlayer.setState({ loading: false }))
-audio.addEventListener('timeupdate', () => {
+onAudio('pause', () => usePlayer.setState({ playing: false }))
+onAudio('waiting', () => usePlayer.setState({ loading: true }))
+onAudio('canplay', () => usePlayer.setState({ loading: false }))
+onAudio('timeupdate', () => {
   usePlayer.setState({ time: audio.currentTime })
   trackerTime(audio.currentTime, !audio.paused, audio.duration)
+  preloadNext()
 })
-audio.addEventListener('loadedmetadata', () => {
+onAudio('loadedmetadata', () => {
   if (pendingSeek !== null && Number.isFinite(audio.duration) && pendingSeek < audio.duration - 1) audio.currentTime = pendingSeek
   pendingSeek = null
 })
-audio.addEventListener('durationchange', () => {
+onAudio('durationchange', () => {
   if (Number.isFinite(audio.duration)) usePlayer.setState({ duration: audio.duration })
 })
-audio.addEventListener('ended', () => {
+onAudio('ended', () => {
   trackerFinish('ended')
   usePlayer.getState().next(true)
 })
-audio.addEventListener('seeked', () => {
+onAudio('seeked', () => {
   trackerSeeked(audio.currentTime)
   pushPresence()
 })
@@ -352,7 +441,14 @@ function pushPresence(): void {
 
 usePlayer.subscribe((s, prev) => {
   if (s.current?.trackId !== prev.current?.trackId || s.playing !== prev.playing) pushPresence()
-  if (s.pos !== prev.pos || s.order !== prev.order || s.repeat !== prev.repeat) prefetchAutoplay()
+  if (s.pos !== prev.pos || s.order !== prev.order || s.repeat !== prev.repeat) {
+    prefetchAutoplay()
+    // Nächster Track hat sich geändert (Warteschlange bearbeitet …) → falsch vorgeladenes verwerfen
+    const next = upcomingTrack()
+    if (standby.dataset.trackId && standby.dataset.trackId !== next?.trackId) resetStandby()
+    preloadNext()
+  }
+  if (s.playing && !prev.playing) preloadNext()
   if (s.queue !== prev.queue || s.order !== prev.order || s.pos !== prev.pos || s.shuffle !== prev.shuffle || s.repeat !== prev.repeat) saveSession()
 })
 useSettings.subscribe((s, prev) => {
@@ -441,16 +537,16 @@ function restoreSession(): void {
 
 // Position regelmäßig und beim Beenden sichern
 let lastTimeSave = 0
-audio.addEventListener('timeupdate', () => {
+onAudio('timeupdate', () => {
   const now = Date.now()
   if (now - lastTimeSave > 5000) {
     lastTimeSave = now
     saveSession()
   }
 })
-audio.addEventListener('pause', saveSession)
+onAudio('pause', saveSession)
 window.addEventListener('beforeunload', writeSession)
-audio.addEventListener('error', () => {
+onAudio('error', () => {
   // Signierte Stream-URL abgelaufen o.ä. → einmal neu auflösen
   const { current, source } = usePlayer.getState()
   if (current && source === 'stream' && !audio.dataset.retried) {
@@ -462,7 +558,7 @@ audio.addEventListener('error', () => {
 })
 
 export function initPlayer(volume: number): void {
-  audio.volume = volume
+  for (const el of elements) el.volume = volume
   usePlayer.setState({ volume })
   restoreSession()
   if ('mediaSession' in navigator) {

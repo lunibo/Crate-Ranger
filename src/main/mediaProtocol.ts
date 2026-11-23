@@ -2,6 +2,7 @@ import { protocol, type Protocol } from 'electron'
 import { createReadStream, statSync } from 'node:fs'
 import { extname, resolve, sep } from 'node:path'
 import { Readable } from 'node:stream'
+import { COVER_SCHEME } from './cache/coverCache'
 
 export const MEDIA_SCHEME = 'media'
 
@@ -9,7 +10,8 @@ const MIME: Record<string, string> = { '.flac': 'audio/flac', '.mp3': 'audio/mpe
 
 export function registerMediaScheme(): void {
   protocol.registerSchemesAsPrivileged([
-    { scheme: MEDIA_SCHEME, privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true } }
+    { scheme: MEDIA_SCHEME, privileges: { secure: true, standard: true, stream: true, supportFetchAPI: true } },
+    { scheme: COVER_SCHEME, privileges: { secure: true, standard: true } }
   ])
 }
 

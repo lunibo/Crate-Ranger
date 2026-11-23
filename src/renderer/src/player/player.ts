@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { errorMessage, releaseCover, similarTo, toTrack, type TrackLite } from '../lib/api'
+import { errorMessage, releaseCoverRemote, similarTo, toTrack, type TrackLite } from '../lib/api'
 import { localFile, toast, useLibrary, useSettings } from '../lib/stores'
 import { t } from '../lib/i18n'
 import { clearUpcoming, firstAutoplayPos, insertAt, moveUpcoming, removeUpcoming } from './queueOps'
@@ -130,7 +130,7 @@ function updateMediaSession(t: TrackLite): void {
     title: t.version ? `${t.title} (${t.version})` : t.title,
     artist: t.artistsTitle,
     album: t.releaseTitle,
-    artwork: [{ src: releaseCover(t.releaseId, 512), sizes: '512x512', type: 'image/webp' }]
+    artwork: [{ src: releaseCoverRemote(t.releaseId, 512), sizes: '512x512', type: 'image/webp' }]
   })
 }
 
@@ -432,7 +432,7 @@ function pushPresence(): void {
     artists: current.artistsTitle,
     artistUri: current.artists[0]?.uri || undefined,
     album: current.releaseTitle,
-    coverUrl: releaseCover(current.releaseId, 512),
+    coverUrl: releaseCoverRemote(current.releaseId, 512),
     playing,
     position: audio.currentTime || 0,
     duration: Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : current.duration

@@ -24,6 +24,7 @@ import { migrateUserData } from './migrate'
 import { getSettings, updateSettings } from './settings'
 import { clearStreamCache, resolveStreamUrl } from './stream'
 import { DiscordPresence } from './discord/presence'
+import { COVER_SCHEME, CoverCache, serveCover } from './cache/coverCache'
 import { DEFAULT_DISCORD_CLIENT_ID } from '@shared/discord'
 import { StatsStore } from './stats/store'
 
@@ -135,6 +136,9 @@ app.whenReady().then(() => {
       }
     }
   })
+
+  const covers = new CoverCache(join(userData, 'Cover Cache'), (url) => api.fetchAbsolute(url))
+  ses.protocol.handle(COVER_SCHEME, (req) => serveCover(covers, req.url))
 
   handleMediaProtocol(ses.protocol, (p) => {
     if (isInside(p, getSettings().downloadRoot)) return true

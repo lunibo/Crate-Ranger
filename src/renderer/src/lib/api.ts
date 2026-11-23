@@ -85,10 +85,15 @@ export function toTrack(t: CatalogTrack): TrackLite {
 }
 
 // ---------- Bilder ----------
-export const releaseCover = (releaseId: string, width = 300, fileId?: string): string =>
-  `${API}/release/${releaseId}/cover?width=${width}${fileId ? `&fileID=${fileId}` : ''}`
-export const fileCover = (fileId: string, width = 300): string => `${API}/file/${fileId}/cover?width=${width}`
-export const artistImage = (artistId: string, width = 300): string => `${API}/artist/${artistId}/cover?width=${width}`
+// Bilder laufen über den Cover-Cache des Hauptprozesses (cover://img/… → Festplatte, sonst API)
+const COVERS = 'cover://img'
+const coverPath = (kind: 'release' | 'file' | 'artist', id: string, width: number, fileId?: string): string =>
+  `/${kind}/${encodeURIComponent(id)}/cover?width=${Math.round(width)}${fileId ? `&fileID=${encodeURIComponent(fileId)}` : ''}`
+export const releaseCover = (releaseId: string, width = 300, fileId?: string): string => COVERS + coverPath('release', releaseId, width, fileId)
+export const fileCover = (fileId: string, width = 300): string => COVERS + coverPath('file', fileId, width)
+export const artistImage = (artistId: string, width = 300): string => COVERS + coverPath('artist', artistId, width)
+/** Öffentliche https-Adresse – für Stellen außerhalb der App (Discord, Medien-Steuerung des Systems) */
+export const releaseCoverRemote = (releaseId: string, width = 300): string => API + coverPath('release', releaseId, width)
 
 // ---------- Katalog ----------
 export interface CatalogFilter {

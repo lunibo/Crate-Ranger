@@ -114,6 +114,7 @@ code { font-family: 'Cascadia Code', Consolas, monospace; font-size: 12px; backg
 .dl-menu { position: relative; display: inline-block; }
 .menu { position: absolute; z-index: 50; top: calc(100% + 6px); left: 0; min-width: 220px; background: #1a2232; border: 1px solid var(--line); border-radius: 10px; padding: 6px; box-shadow: 0 16px 40px rgba(0,0,0,.5); }
 .row-menu { right: 0; left: auto; top: 100%; }
+.context-menu { position: fixed; z-index: 1000; max-height: calc(100vh - 16px); overflow-y: auto; }
 .menu-item { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 8px 12px; border-radius: 6px; color: var(--text); font-size: 13px; }
 .menu-item:hover { background: var(--bg-hover); }
 .menu-sep { height: 1px; background: var(--line); margin: 6px 4px; }
@@ -168,7 +169,7 @@ code { font-family: 'Cascadia Code', Consolas, monospace; font-size: 12px; backg
 .tr { display: grid; grid-template-columns: 44px minmax(220px, 3fr) 1.3fr 1fr 48px 60px 56px 104px; align-items: center; gap: 12px; padding: 0 12px; height: 56px; border-radius: 8px; }
 .tracktable:not(.with-rel) .tr { grid-template-columns: 44px minmax(220px, 4fr) 1.2fr 48px 60px 56px 104px; }
 .tr.head { height: 36px; color: var(--text-3); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid var(--line); border-radius: 0; margin-bottom: 6px; }
-.tr:not(.head):hover { background: rgba(255,255,255,.05); }
+.tr:not(.head):hover, .tr.ctx { background: rgba(255,255,255,.05); }
 .tr.active .t { color: var(--accent); }
 .td { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
 .td.num { text-align: center; position: relative; color: var(--text-3); }

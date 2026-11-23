@@ -142,6 +142,13 @@ export function SettingsPage() {
             <input type="checkbox" checked={settings.skipExisting} onChange={(e) => void update({ skipExisting: e.target.checked })} />
             {t('settings.downloads.skipExisting')}
           </label>
+          <label className="check multi">
+            <input type="checkbox" checked={settings.copyToAllReleases} disabled={!settings.skipExisting} onChange={(e) => void update({ copyToAllReleases: e.target.checked })} />
+            <span>
+              {t('settings.downloads.copyToAllReleases')}
+              <span className="hint">{t('settings.downloads.copyToAllReleasesHint')}</span>
+            </span>
+          </label>
           <label className="check">
             <input type="checkbox" checked={settings.saveCoverFile} onChange={(e) => void update({ saveCoverFile: e.target.checked })} />
             {t('settings.downloads.saveCover')}

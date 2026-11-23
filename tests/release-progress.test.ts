@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -65,5 +65,25 @@ describe('Release-Fortschritt mit Tracks aus anderen Releases', () => {
     expect(releaseProgress(lib.snapshot(), 'album').done).toBe(1)
     lib.snapshot().tracks.t1.files.forEach((f) => (f.missing = true))
     expect(releaseProgress(lib.snapshot(), 'album').done).toBe(0)
+  })
+  it('hält Dateien pro Release getrennt und ersetzt nur die Datei desselben Releases', () => {
+    const { lib, file } = setup()
+    lib.addFile(track('t1', 'single'), flac(file('s.flac')))
+    lib.addFile({ ...track('t1', 'album'), trackNumber: 7 }, flac(file('a.flac')))
+    lib.addFile({ ...track('t1', 'album'), trackNumber: 7 }, flac(file('a2.flac')))
+    const t1 = lib.getTrack('t1')!
+    expect(t1.releaseId).toBe('single')
+    expect(t1.files.map((f) => [f.releaseId, f.trackNumber, f.path.slice(-7)])).toEqual([['single', 1, '/s.flac'], ['album', 7, 'a2.flac']])
+  })
+
+  it('ordnet Dateien aus älteren Bibliotheken dem Release des Tracks zu', () => {
+    const { lib, file } = setup()
+    lib.addFile(track('t1', 'single'), flac(file('s.flac')))
+    lib.flush()
+    const path = (lib as unknown as { file: string }).file
+    const raw = JSON.parse(readFileSync(path, 'utf8'))
+    for (const f of raw.tracks.t1.files) { delete f.releaseId; delete f.trackNumber }
+    writeFileSync(path, JSON.stringify(raw))
+    expect(new LibraryStore(path).getTrack('t1')!.files[0]).toMatchObject({ releaseId: 'single', trackNumber: 1 })
   })
 })

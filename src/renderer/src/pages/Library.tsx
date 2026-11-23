@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { locale } from '../lib/i18n'
 import { Link } from 'react-router-dom'
 import { stripFeaturing } from '@shared/artists'
-import type { LibraryRefreshProgress, LibraryTrack } from '@shared/types'
+import type { LibraryRefreshProgress, LibraryRelease, LibraryTrack } from '@shared/types'
 import { FORMAT_LABEL } from '@shared/types'
 import { releaseCover, type TrackLite } from '../lib/api'
 import { fmtBytes } from '../lib/format'
-import { downloadRelease, toast, useLibrary, useSettings } from '../lib/stores'
+import { downloadRelease, releaseProgress, toast, useLibrary, useSettings } from '../lib/stores'
 import { usePlayer } from '../player/player'
 import { Cover, Empty } from '../components/Common'
 import { ArtistLinks, TrackLink } from '../components/ArtistLinks'
@@ -19,6 +19,25 @@ function libToTrack(t: LibraryTrack): TrackLite {
     releaseTitle: t.releaseTitle, releaseArtist: t.releaseArtist, releaseDate: '', releaseType: '', coverFileId: '',
     duration: 0, bpm: 0, genres: [], tags: [], creatorSafe: false, explicit: false, favorite: false, brand: '', trackNumber: t.trackNumber, preRelease: false
   }
+}
+
+/** Ein Eintrag pro Release, für das der Track Dateien hat (Kopien in Single- und Album-Ordner). */
+function perRelease(tr: LibraryTrack, releases: Record<string, LibraryRelease>): LibraryTrack[] {
+  const ids = [...new Set(tr.files.map((f) => f.releaseId ?? tr.releaseId))]
+  if (ids.length <= 1 && (ids[0] ?? tr.releaseId) === tr.releaseId) return [tr]
+  return ids.map((releaseId) => {
+    const files = tr.files.filter((f) => (f.releaseId ?? tr.releaseId) === releaseId)
+    if (releaseId === tr.releaseId) return { ...tr, files }
+    const info = releases[releaseId]
+    return {
+      ...tr,
+      releaseId,
+      files,
+      trackNumber: files[0]?.trackNumber ?? tr.trackNumber,
+      releaseTitle: info?.title ?? tr.releaseTitle,
+      releaseArtist: info?.artist ?? tr.releaseArtist
+    }
+  })
 }
 
 /** Tab „Heruntergeladen“ in der Downloads-Ansicht. */
@@ -38,13 +57,15 @@ export function LibraryView() {
     const f = filter.trim().toLowerCase()
     const byArtist = new Map<string, Map<string, LibraryTrack[]>>()
     for (const tr of Object.values(snap.tracks)) {
-      if (f && ![tr.title, tr.artist, tr.releaseTitle, tr.releaseArtist].some((x) => x?.toLowerCase().includes(f))) continue
-      // Gruppiert wie die Ordner: „Stonebank feat. EMEL“ landet bei „Stonebank“
-      const artist = stripFeaturing(tr.releaseArtist || tr.artist) || unknown
-      if (!byArtist.has(artist)) byArtist.set(artist, new Map())
-      const rels = byArtist.get(artist)!
-      if (!rels.has(tr.releaseId)) rels.set(tr.releaseId, [])
-      rels.get(tr.releaseId)!.push(tr)
+      for (const entry of perRelease(tr, snap.releases)) {
+        if (f && ![entry.title, entry.artist, entry.releaseTitle, entry.releaseArtist].some((x) => x?.toLowerCase().includes(f))) continue
+        // Gruppiert wie die Ordner: „Stonebank feat. EMEL“ landet bei „Stonebank“
+        const artist = stripFeaturing(entry.releaseArtist || entry.artist) || unknown
+        if (!byArtist.has(artist)) byArtist.set(artist, new Map())
+        const rels = byArtist.get(artist)!
+        if (!rels.has(entry.releaseId)) rels.set(entry.releaseId, [])
+        rels.get(entry.releaseId)!.push(entry)
+      }
     }
     return [...byArtist.entries()]
       .sort((a, b) => a[0].localeCompare(b[0], locale()))
@@ -122,8 +143,8 @@ export function LibraryView() {
           <section key={g.artist} className="lib-artist">
             <h2><ArtistLinks text={g.artist} releaseId={g.releases[0]?.releaseId} /></h2>
             {g.releases.map((r) => {
-              const total = r.info?.trackTotal ?? 0
-              const have = r.tracks.filter((tr) => tr.files.some((f) => !f.missing)).length
+              // Zählt auch Tracks mit, die nur über ein anderes Release (z.B. Single) vorhanden sind
+              const { done: have, total } = releaseProgress(snap, r.releaseId)
               return (
                 <div key={r.releaseId} className="lib-release">
                   <Link to={`/release/${r.releaseId}`}><Cover src={releaseCover(r.releaseId, 160)} alt={r.info?.title ?? ''} size={72} /></Link>

@@ -82,7 +82,7 @@ export class DownloadQueue {
   }
 
   private persist(): void {
-    const keep = this.jobs.filter((j) => j.status !== 'done' && j.status !== 'skipped' && j.status !== 'cancelled')
+    const keep = this.jobs.filter((j) => j.status !== 'done' && j.status !== 'copied' && j.status !== 'skipped' && j.status !== 'cancelled')
     writeJsonAtomic(this.opts.stateFile, { jobs: keep, paused: this.paused })
   }
 

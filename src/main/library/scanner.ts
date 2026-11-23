@@ -33,13 +33,15 @@ export async function scanFolder(root: string, store: LibraryStore): Promise<Sca
     try {
       const ids = readSoundScoutIds(path)
       if (!ids) continue
-      const known = store.getTrack(ids.trackId)
-      if (known?.files.some((f) => f.path === path && !f.missing)) continue
+      const found = store.getTrack(ids.trackId)
+      if (found?.files.some((f) => f.path === path && !f.missing)) continue
       const st = await stat(path)
+      // Kopie für ein anderes Release → Angaben aus der Datei, nicht vom Haupt-Release übernehmen
+      const known = found && (!ids.releaseId || found.releaseId === ids.releaseId) ? found : undefined
       store.addFile(
         {
           trackId: ids.trackId,
-          releaseId: ids.releaseId || known?.releaseId || '',
+          releaseId: ids.releaseId || found?.releaseId || '',
           title: known?.title || ids.title,
           artist: known?.artist || ids.artist,
           releaseTitle: known?.releaseTitle || ids.album,

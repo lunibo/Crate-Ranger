@@ -1,7 +1,7 @@
 import { createWriteStream, existsSync } from 'node:fs'
 import { isPreRelease } from '@shared/release'
 import { formatDateTime, t } from '../i18n'
-import { mkdir, rename, rm, stat } from 'node:fs/promises'
+import { copyFile, mkdir, rename, rm, stat } from 'node:fs/promises'
 import { basename, dirname, extname, join } from 'node:path'
 import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
@@ -21,7 +21,7 @@ export interface WorkerContext {
 }
 
 export interface WorkerResult {
-  status: 'done' | 'skipped'
+  status: 'done' | 'copied' | 'skipped'
   path: string
 }
 
@@ -47,12 +47,19 @@ export async function downloadTrack(deps: DownloaderDeps, job: DownloadJob, ctx:
   const ext = FORMAT_EXT[job.format]
 
   ctx.setStatus('preparing')
+  // Datei eines anderen Releases (z.B. Single), die für dieses Release kopiert und neu getaggt wird
+  let copySource: string | null = null
   if (settings.skipExisting && !job.force) {
+    const here = library.existingFile(job.trackId, job.format, job.releaseId)
+    if (here) return { status: 'skipped', path: here.path }
     const existing = library.existingFile(job.trackId, job.format)
     if (existing) {
-      // Track schon von einem anderen Release vorhanden (z.B. Single) → diesem Release zuordnen
-      library.linkRelease(job.releaseId, [job.trackId])
-      return { status: 'skipped', path: existing.path }
+      if (!settings.copyToAllReleases) {
+        // Track schon von einem anderen Release vorhanden → diesem Release nur zuordnen
+        library.linkRelease(job.releaseId, [job.trackId])
+        return { status: 'skipped', path: existing.path }
+      }
+      copySource = existing.path
     }
   }
 
@@ -60,6 +67,11 @@ export async function downloadTrack(deps: DownloaderDeps, job: DownloadJob, ctx:
   if (isPreRelease(row.ReleaseDate)) {
     // Kein Encoding-Aufruf vor Release-Tag (zählt nicht aufs Kontingent, wird von SoundScout ohnehin abgelehnt)
     throw Object.assign(new Error(t('errors.preRelease', { date: formatDateTime(row.ReleaseDate!) })), { code: 'prerelease', status: 409 })
+  }
+  if (copySource) {
+    // Release nicht im Katalog des Tracks gefunden → Metadaten gehören zu einem Release, das schon vorhanden ist
+    const already = library.existingFile(job.trackId, job.format, meta.releaseId)
+    if (already) return { status: 'skipped', path: already.path }
   }
   const target = buildTrackPath(settings.downloadRoot, settings.pathTemplate, meta, ext)
   const dir = dirname(target)
@@ -90,16 +102,42 @@ export async function downloadTrack(deps: DownloaderDeps, job: DownloadJob, ctx:
     )
   }
 
+  /** Vorhandene Datei in den Ordner dieses Releases kopieren und mit dessen Metadaten + Cover taggen. */
+  const copyForRelease = async (source: string): Promise<void> => {
+    ctx.setStatus('tagging')
+    await mkdir(dir, { recursive: true })
+    const partial = join(dir, `${basename(target, extname(target))}.partial.${ext}`)
+    try {
+      await copyFile(source, partial)
+      const cover = await coverForEmbedding(api, meta.releaseId)
+      // Ohne Release-Cover (offline o.ä.) bleibt das vorhandene Bild erhalten
+      writeTags(partial, meta, cover, !!cover)
+      if (settings.saveCoverFile) await ensureCoverFile(dir, cover ?? readEmbeddedPicture(partial), api, meta.releaseId)
+      if (existsSync(target)) await rm(target, { force: true })
+      await rename(partial, target)
+    } catch (e) {
+      await rm(partial, { force: true }).catch(() => undefined)
+      throw e
+    }
+    await register(target)
+  }
+
   // Datei liegt schon am Zielort (z.B. Index gelöscht) → nur registrieren, kein Download-Kontingent verbrauchen
   if (settings.skipExisting && !job.force && existsSync(target)) {
     try {
-      if (readSoundScoutIds(target)?.trackId === job.trackId) {
+      const ids = readSoundScoutIds(target)
+      if (ids?.trackId === job.trackId && (!ids.releaseId || ids.releaseId === meta.releaseId)) {
         await register(target)
         return { status: 'skipped', path: target }
       }
     } catch {
       /* unlesbar → neu laden */
     }
+  }
+
+  if (copySource) {
+    await copyForRelease(copySource)
+    return { status: 'copied', path: target }
   }
 
   const enc = await api.get<EncodingResponse>(`/release/${meta.releaseId}/track/${meta.trackId}/encoding`, {

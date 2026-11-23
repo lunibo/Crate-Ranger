@@ -76,7 +76,9 @@ export async function refreshLibrary(
   const root = settings.downloadRoot
   const items: { trackId: string; releaseId: string; file: LibraryFile }[] = []
   for (const t of Object.values(library.snapshot().tracks)) {
-    for (const f of t.files) if (!f.missing && existsSync(f.path)) items.push({ trackId: t.trackId, releaseId: t.releaseId, file: f })
+    for (const f of t.files) {
+      if (!f.missing && existsSync(f.path)) items.push({ trackId: t.trackId, releaseId: f.releaseId ?? t.releaseId, file: f })
+    }
   }
 
   const result: LibraryRefreshResult = { total: items.length, retagged: 0, moved: 0, failed: 0, errors: [] }

@@ -122,8 +122,9 @@ export function makePicture(cover: CoverImage): Picture {
  * - FLAC: entfernt den nicht-standardkonformen ID3v2-Header der SoundScout-Dateien, schreibt Vorbis Comments.
  * - MP3/WAV: ID3v2.4 inkl. TXXX-Feldern.
  * Vorhandene Cover bleiben erhalten; fehlt eines, wird `cover` eingebettet.
+ * Mit `replaceCover` ersetzt `cover` vorhandene Bilder (Kopie für ein anderes Release).
  */
-export function writeTags(path: string, m: TrackMeta, cover?: CoverImage | null): void {
+export function writeTags(path: string, m: TrackMeta, cover?: CoverImage | null, replaceCover = false): void {
   Id3v2Settings.defaultVersion = 4
   Id3v2Settings.forceDefaultVersion = true
   const file = TagFile.createFromPath(path)
@@ -139,7 +140,7 @@ export function writeTags(path: string, m: TrackMeta, cover?: CoverImage | null)
       setStandard(file.tag, m)
       writeId3(t, m)
     }
-    if (cover && file.tag.pictures.length === 0) file.tag.pictures = [makePicture(cover)]
+    if (cover && (replaceCover || file.tag.pictures.length === 0)) file.tag.pictures = [makePicture(cover)]
     file.save()
   } finally {
     file.dispose()

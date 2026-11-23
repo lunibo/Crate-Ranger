@@ -301,7 +301,7 @@ code { font-family: 'Cascadia Code', Consolas, monospace; font-size: 12px; backg
 .job-sub { display: flex; gap: 10px; align-items: center; font-size: 12px; margin-top: 2px; }
 .job-status { font-weight: 700; }
 .s-downloading, .s-preparing, .s-tagging { color: #9db8ff; }
-.s-done { color: var(--ok); }
+.s-done, .s-copied { color: var(--ok); }
 .s-skipped { color: var(--text-2); }
 .s-error { color: var(--danger); }
 .s-queued, .s-cancelled { color: var(--text-3); }
@@ -321,6 +321,10 @@ code { font-family: 'Cascadia Code', Consolas, monospace; font-size: 12px; backg
 .preview { user-select: text; word-break: break-all; }
 .check { display: flex; gap: 10px; align-items: center; color: var(--text-2); }
 .check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.check.multi { align-items: flex-start; }
+.check.multi input { flex: none; margin-top: 2px; }
+.check.multi .hint { display: block; line-height: 1.5; margin-top: 2px; }
+.check input:disabled + span { opacity: 0.6; }
 .kv { display: flex; gap: 16px; width: 100%; }
 .kv > span:first-child { width: 120px; color: var(--text-2); }
 

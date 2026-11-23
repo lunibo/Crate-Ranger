@@ -34,10 +34,10 @@ function JobRow({ j }: { j: DownloadJob }) {
         {active && <div className="bar"><div className="bar-fill" style={{ width: `${j.status === 'tagging' ? 100 : pct}%` }} /></div>}
       </div>
       <div className="job-actions">
-        {(j.status === 'done' || j.status === 'skipped') && j.path && (
+        {(j.status === 'done' || j.status === 'copied' || j.status === 'skipped') && j.path && (
           <button className="icon-btn" title={t('common.showInExplorer')} onClick={() => void window.ss.shell.showItem(j.path!)}><IconFolder size={16} /></button>
         )}
-        {j.status === 'done' && <span className="status ok"><IconCheck size={16} /></span>}
+        {(j.status === 'done' || j.status === 'copied') && <span className="status ok"><IconCheck size={16} /></span>}
         {(j.status === 'error' || j.status === 'cancelled') && (
           <button className="icon-btn" title={t('common.retry')} onClick={() => void window.ss.downloads.retry(j.id)}><IconRefresh size={16} /></button>
         )}
@@ -78,11 +78,11 @@ function QueueView() {
   const q = useDownloads((s) => s.queue)
   const counts = q.jobs.reduce<Record<string, number>>((m, j) => ({ ...m, [j.status]: (m[j.status] ?? 0) + 1 }), {})
   const open = ACTIVE_STATUSES.reduce((n, s) => n + (counts[s] ?? 0), 0)
-  const order: JobStatus[] = ['downloading', 'tagging', 'preparing', 'queued', 'error', 'cancelled', 'done', 'skipped']
+  const order: JobStatus[] = ['downloading', 'tagging', 'preparing', 'queued', 'error', 'cancelled', 'done', 'copied', 'skipped']
   const jobs = [...q.jobs].sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status) || a.addedAt - b.addedAt)
   return (
     <>
-      <div className="tab-summary muted">{t('downloads.summary', { open, done: counts.done ?? 0, skipped: counts.skipped ?? 0, errors: counts.error ?? 0 })}</div>
+      <div className="tab-summary muted">{t('downloads.summary', { open, done: counts.done ?? 0, copied: counts.copied ?? 0, skipped: counts.skipped ?? 0, errors: counts.error ?? 0 })}</div>
       <QuotaMeter />
       {q.paused && (
         <div className="notice warn">

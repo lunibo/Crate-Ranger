@@ -194,6 +194,8 @@ export interface Settings {
   pathTemplate: string
   concurrency: number
   skipExisting: boolean
+  /** Ist ein Track schon über ein anderes Release vorhanden, Datei in den Release-Ordner kopieren und neu taggen */
+  copyToAllReleases: boolean
   saveCoverFile: boolean
   volume: number
   /** „system“ oder Sprachcode (z.B. „de“, „en“) */
@@ -296,7 +298,7 @@ export const DEFAULT_PATH_TEMPLATE =
 
 // ---------- Downloads ----------
 
-export type JobStatus = 'queued' | 'preparing' | 'downloading' | 'tagging' | 'done' | 'skipped' | 'error' | 'cancelled'
+export type JobStatus = 'queued' | 'preparing' | 'downloading' | 'tagging' | 'done' | 'copied' | 'skipped' | 'error' | 'cancelled'
 
 export interface DownloadJob {
   id: string
@@ -367,6 +369,10 @@ export interface LibraryFile {
   size: number
   downloadedAt: number
   missing?: boolean
+  /** Release, für das die Datei abgelegt und getaggt ist (ein Track kann mehreren Releases angehören). */
+  releaseId?: string
+  /** Tracknummer innerhalb dieses Releases */
+  trackNumber?: number
 }
 
 export interface LibraryTrack {

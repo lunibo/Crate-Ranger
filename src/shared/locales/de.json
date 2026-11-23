@@ -172,7 +172,7 @@
     "signInRequired": "Zum Herunterladen bitte zuerst bei SoundScout anmelden."
   },
   "downloads": {
-    "summary": "{{open}} offen · {{done}} fertig · {{skipped}} übersprungen · {{errors}} Fehler",
+    "summary": "{{open}} offen · {{done}} fertig · {{copied}} kopiert · {{skipped}} übersprungen · {{errors}} Fehler",
     "paused": "Warteschlange pausiert",
     "pausedReason": "Warteschlange pausiert: {{reason}}",
     "resume": "Fortsetzen",
@@ -189,6 +189,7 @@
     "downloading": "Lädt",
     "tagging": "Tags & Cover",
     "done": "Fertig",
+    "copied": "Kopiert",
     "skipped": "Bereits vorhanden",
     "error": "Fehler",
     "cancelled": "Abgebrochen"
@@ -355,6 +356,8 @@
       "restoreDefault": "Standard wiederherstellen",
       "concurrency": "Gleichzeitige Downloads",
       "skipExisting": "Bereits heruntergeladene Tracks überspringen (spart Download-Kontingent)",
+      "copyToAllReleases": "Tracks in jedem Release ablegen",
+      "copyToAllReleasesHint": "Gehört ein bereits geladener Track auch zu einem anderen Release (z. B. Single und Album), wird die Datei in dessen Ordner kopiert und mit dessen Metadaten und Cover getaggt – ohne erneuten Download. Für bereits geladene Releases einfach das Release noch einmal herunterladen.",
       "saveCover": "cover.jpg im Release-Ordner ablegen"
     },
     "metadata": {

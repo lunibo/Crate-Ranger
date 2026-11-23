@@ -37,6 +37,10 @@ const bridge: SsBridge = {
     quota: () => ipcRenderer.invoke('downloads:quota'),
     onQuota: (cb) => on<QuotaInfo>('downloads:quota', cb)
   },
+  cache: {
+    info: () => ipcRenderer.invoke('cache:info'),
+    clear: () => ipcRenderer.invoke('cache:clear')
+  },
   stats: {
     play: (record, final) => ipcRenderer.send('stats:play', record, final),
     event: (e) => ipcRenderer.send('stats:event', e),

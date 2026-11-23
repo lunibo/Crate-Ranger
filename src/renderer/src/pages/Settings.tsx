@@ -9,6 +9,7 @@ import { Section, Spinner } from '../components/Common'
 import { QuotaMeter } from '../components/QuotaMeter'
 import { DiscordSection } from '../components/DiscordSection'
 import { StatsSection } from '../components/StatsSection'
+import { CacheSection } from '../components/CacheSection'
 import { UpdateSection } from '../components/UpdateSection'
 
 const PLACEHOLDERS = ['releaseArtist', 'releaseArtistFull', 'year', 'releaseTitle', 'catalogId', 'trackNo', 'trackTitle', 'title', 'version', 'trackArtist', 'brand', 'releaseType', 'label']
@@ -68,6 +69,8 @@ export function SettingsPage() {
       <DiscordSection />
 
       <StatsSection />
+
+      <CacheSection />
 
       <UpdateSection />
 

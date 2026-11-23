@@ -382,6 +382,22 @@
       "confirm": "Delete all listening statistics permanently?",
       "confirmYes": "Delete",
       "cleared": "Listening statistics deleted"
+    },
+    "cache": {
+      "title": "Cache",
+      "covers": "Covers",
+      "images_one": "{{formatted}} image",
+      "images_other": "{{formatted}} images",
+      "data": "Catalog data",
+      "entries_one": "{{formatted}} entry",
+      "entries_other": "{{formatted}} entries",
+      "browser": "Browser cache",
+      "total": "Total",
+      "hint": "Covers (max. 300 MB) and catalog data are cached so pages load faster. Music is not cached but streamed – downloaded tracks are not affected.",
+      "clear": "Clear cache",
+      "confirm": "Delete covers, catalog data and browser cache? Downloaded tracks are kept.",
+      "confirmYes": "Clear",
+      "cleared": "Cache cleared"
     }
   },
   "queue": {

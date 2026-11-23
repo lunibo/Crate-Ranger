@@ -420,6 +420,14 @@ export interface ScanResult {
 
 export type ApiParams = Record<string, string | number | boolean | (string | number)[] | undefined | null>
 
+/** Größe der Zwischenspeicher (Einstellungen → Cache) */
+export interface CacheInfo {
+  coverBytes: number
+  coverCount: number
+  /** Chromium-HTTP-Cache der Sitzung (Skripte, alte Bildantworten, Stream-Puffer) */
+  httpBytes: number
+}
+
 export interface SsBridge {
   api: {
     get<T = unknown>(path: string, params?: ApiParams): Promise<T>
@@ -449,6 +457,11 @@ export interface SsBridge {
     onUpdate(cb: (s: QueueState) => void): () => void
     quota(): Promise<QuotaInfo>
     onQuota(cb: (q: QuotaInfo) => void): () => void
+  }
+  cache: {
+    info(): Promise<CacheInfo>
+    /** Cover-Cache und Chromium-HTTP-Cache leeren (heruntergeladene Tracks bleiben) */
+    clear(): Promise<void>
   }
   stats: {
     /** laufende Wiedergabe melden (final = abgeschlossen) */

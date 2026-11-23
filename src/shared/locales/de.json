@@ -382,6 +382,22 @@
       "confirm": "Alle Hörstatistiken endgültig löschen?",
       "confirmYes": "Löschen",
       "cleared": "Hörstatistik gelöscht"
+    },
+    "cache": {
+      "title": "Cache",
+      "covers": "Cover",
+      "images_one": "{{formatted}} Bild",
+      "images_other": "{{formatted}} Bilder",
+      "data": "Katalogdaten",
+      "entries_one": "{{formatted}} Eintrag",
+      "entries_other": "{{formatted}} Einträge",
+      "browser": "Browser-Cache",
+      "total": "Gesamt",
+      "hint": "Cover (max. 300 MB) und Katalogdaten werden zwischengespeichert, damit Seiten schneller laden. Musik wird nicht zwischengespeichert, sondern gestreamt – heruntergeladene Tracks sind davon nicht betroffen.",
+      "clear": "Cache leeren",
+      "confirm": "Cover, Katalogdaten und Browser-Cache löschen? Heruntergeladene Tracks bleiben erhalten.",
+      "confirmYes": "Leeren",
+      "cleared": "Cache geleert"
     }
   },
   "queue": {

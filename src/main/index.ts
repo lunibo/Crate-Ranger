@@ -220,6 +220,13 @@ app.whenReady().then(() => {
   ipcMain.on('stats:event', (_e, ev: Partial<StatEvent>) => {
     if (getSettings().statsEnabled && ev && typeof ev === 'object') stats.event(ev.type, ev.ref)
   })
+  // ---------- Cache ----------
+  ipcMain.handle('cache:info', async () => ({ coverBytes: covers.size, coverCount: covers.count, httpBytes: await ses.getCacheSize() }))
+  ipcMain.handle('cache:clear', async () => {
+    await covers.clear()
+    await ses.clearCache()
+    clearStreamCache()
+  })
   ipcMain.handle('stats:get', (): StatsData => ({ plays: stats.plays(), events: stats.events(), downloads: quota.history() }))
   ipcMain.handle('stats:clear', () => stats.clear())
 

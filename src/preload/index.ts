@@ -62,6 +62,7 @@ const bridge: SsBridge = {
     verify: () => ipcRenderer.invoke('library:verify'),
     scan: () => ipcRenderer.invoke('library:scan'),
     remove: (trackId, deleteFiles) => ipcRenderer.invoke('library:remove', trackId, deleteFiles),
+    linkRelease: (releaseId, trackIds, trackTotal) => ipcRenderer.invoke('library:linkRelease', releaseId, trackIds, trackTotal),
     refresh: () => ipcRenderer.invoke('library:refresh'),
     onRefreshProgress: (cb) => on<LibraryRefreshProgress>('library:refreshProgress', cb),
     onUpdate: (cb) => on<LibrarySnapshot>('library:update', cb)

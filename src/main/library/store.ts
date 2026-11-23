@@ -1,5 +1,6 @@
 import { existsSync, statSync, unlinkSync } from 'node:fs'
 import type { DownloadFormat, LibraryFile, LibraryRelease, LibrarySnapshot, LibraryTrack } from '@shared/types'
+import { releaseProgress } from '@shared/libraryProgress'
 import { debounced, readJson, writeJsonAtomic } from '../jsonFile'
 
 interface LibraryFileV1 extends LibrarySnapshot {
@@ -17,11 +18,11 @@ export class LibraryStore {
 
   constructor(private readonly file: string) {
     const raw = readJson<Partial<LibraryFileV1>>(file, {})
-    this.data = { version: 1, tracks: raw.tracks ?? {}, releases: raw.releases ?? {} }
+    this.data = { version: 1, tracks: raw.tracks ?? {}, releases: raw.releases ?? {}, links: raw.links ?? {} }
   }
 
   snapshot(): LibrarySnapshot {
-    return { tracks: this.data.tracks, releases: this.data.releases }
+    return { tracks: this.data.tracks, releases: this.data.releases, links: this.data.links }
   }
 
   onChange(cb: (s: LibrarySnapshot) => void): () => void {
@@ -63,11 +64,32 @@ export class LibraryStore {
     this.changed()
   }
 
+  /**
+   * Ordnet vorhandene Tracks, die unter einem anderen Release gespeichert sind, zusätzlich diesem zu.
+   * Tracks, die direkt unter dem Release liegen oder nicht in der Bibliothek sind, werden ignoriert.
+   */
+  linkRelease(releaseId: string, trackIds: string[], trackTotal = 0): void {
+    const links = (this.data.links ??= {})
+    const prev = links[releaseId]
+    const ids = new Set(prev?.trackIds ?? [])
+    const before = ids.size
+    for (const id of trackIds) {
+      const t = this.data.tracks[id]
+      if (t && t.releaseId !== releaseId) ids.add(id)
+    }
+    const total = trackTotal || prev?.trackTotal || 0
+    if (!ids.size || (ids.size === before && total === (prev?.trackTotal ?? 0))) return
+    links[releaseId] = { trackIds: [...ids], trackTotal: total }
+    this.changed()
+  }
+
   addFile(track: Omit<LibraryTrack, 'files'>, file: LibraryFile): void {
     const prev = this.data.tracks[track.trackId]
     const files = (prev?.files ?? []).filter((f) => f.path !== file.path && f.format !== file.format)
     files.push(file)
     this.data.tracks[track.trackId] = { ...prev, ...track, files }
+    // Track wandert zu einem anderen Release → beim bisherigen weiterhin mitzählen
+    if (prev && prev.releaseId !== track.releaseId) this.linkRelease(prev.releaseId, [track.trackId])
     this.changed()
   }
 
@@ -114,10 +136,7 @@ export class LibraryStore {
   }
 
   releaseStatus(releaseId: string): { downloaded: number; total: number; status: ReleaseStatus } {
-    const total = this.data.releases[releaseId]?.trackTotal ?? 0
-    const downloaded = Object.values(this.data.tracks).filter(
-      (t) => t.releaseId === releaseId && t.files.some((f) => !f.missing)
-    ).length
+    const { done: downloaded, total } = releaseProgress(this.snapshot(), releaseId)
     const status: ReleaseStatus = downloaded === 0 ? 'none' : total > 0 && downloaded >= total ? 'complete' : 'partial'
     return { downloaded, total, status }
   }

@@ -391,9 +391,16 @@ export interface LibraryRelease {
   coverFileId?: string
 }
 
+/** Tracks, die unter einem anderen Release gespeichert sind, aber auch zu diesem gehören (z.B. Single + Album). */
+export interface LibraryReleaseLink {
+  trackIds: string[]
+  trackTotal: number
+}
+
 export interface LibrarySnapshot {
   tracks: Record<string, LibraryTrack>
   releases: Record<string, LibraryRelease>
+  links?: Record<string, LibraryReleaseLink>
 }
 
 export interface LibraryRefreshProgress {
@@ -486,6 +493,8 @@ export interface SsBridge {
     verify(): Promise<ScanResult>
     scan(): Promise<ScanResult>
     remove(trackId: string, deleteFiles: boolean): Promise<void>
+    /** Bereits vorhandene Tracks zusätzlich diesem Release zuordnen (für den Fortschritt). */
+    linkRelease(releaseId: string, trackIds: string[], trackTotal: number): Promise<void>
     /** Tags neu schreiben und Dateien nach aktuellem Ordner-Template einsortieren (kein Download). */
     refresh(): Promise<LibraryRefreshResult>
     onRefreshProgress(cb: (p: LibraryRefreshProgress) => void): () => void

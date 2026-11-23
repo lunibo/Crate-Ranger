@@ -49,7 +49,11 @@ export async function downloadTrack(deps: DownloaderDeps, job: DownloadJob, ctx:
   ctx.setStatus('preparing')
   if (settings.skipExisting && !job.force) {
     const existing = library.existingFile(job.trackId, job.format)
-    if (existing) return { status: 'skipped', path: existing.path }
+    if (existing) {
+      // Track schon von einem anderen Release vorhanden (z.B. Single) → diesem Release zuordnen
+      library.linkRelease(job.releaseId, [job.trackId])
+      return { status: 'skipped', path: existing.path }
+    }
   }
 
   const { meta, row } = await metadata.trackMeta(job.trackId, job.releaseId)

@@ -268,6 +268,10 @@ app.whenReady().then(() => {
     }
   })
   ipcMain.handle('library:remove', (_e, trackId: unknown, deleteFiles?: boolean) => library.remove(assertId(trackId), !!deleteFiles))
+  ipcMain.handle('library:linkRelease', (_e, releaseId: unknown, trackIds: unknown, trackTotal: unknown) => {
+    const ids = (Array.isArray(trackIds) ? trackIds : []).slice(0, 1000).map(assertId)
+    library.linkRelease(assertId(releaseId), ids, typeof trackTotal === 'number' ? trackTotal : 0)
+  })
 
   // ---------- Einstellungen ----------
   ipcMain.handle('settings:get', () => getSettings())

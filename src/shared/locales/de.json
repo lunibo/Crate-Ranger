@@ -151,7 +151,9 @@
     "playbackFailed": "Wiedergabe fehlgeschlagen: {{error}}",
     "playingNext": "„{{title}}“ wird als Nächstes gespielt",
     "addedToQueue_one": "{{count}} Track zur Warteschlange hinzugefügt",
-    "addedToQueue_other": "{{count}} Tracks zur Warteschlange hinzugefügt"
+    "addedToQueue_other": "{{count}} Tracks zur Warteschlange hinzugefügt",
+    "playingNextMany_one": "{{count}} Track wird als Nächstes gespielt",
+    "playingNextMany_other": "{{count}} Tracks werden als Nächstes gespielt"
   },
   "download": {
     "download": "Herunterladen",
@@ -221,7 +223,9 @@
     "moreFrom": "Mehr von {{artist}}",
     "goToArtist": "Zum Artist",
     "play": "„{{title}}“ abspielen",
-    "noTracks": "Dieses Release hat keine abspielbaren Tracks."
+    "noTracks": "Dieses Release hat keine abspielbaren Tracks.",
+    "playNext": "Release als Nächstes spielen",
+    "addToQueue": "Release zur Warteschlange hinzufügen"
   },
   "preRelease": {
     "badge": "Pre-Release",
@@ -571,5 +575,12 @@
     "consentYes": "Ja, nach Updates suchen",
     "consentNo": "Nein",
     "consentHint": "Lässt sich jederzeit in den Einstellungen ändern."
+  },
+  "playQueue": {
+    "clear": "Leeren",
+    "clearHint": "Alle kommenden Tracks entfernen – der aktuelle läuft weiter",
+    "remove": "Aus der Warteschlange entfernen",
+    "upNext": "Als Nächstes",
+    "empty": "Keine weiteren Tracks in der Warteschlange."
   }
 }

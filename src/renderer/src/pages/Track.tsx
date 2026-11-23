@@ -9,7 +9,7 @@ import { downloadTracks, localFile, trackStatus, useAuth, useLibrary } from '../
 import { usePlayer } from '../player/player'
 import { ArtistLinks } from '../components/ArtistLinks'
 import { FavButton } from '../components/FavButton'
-import { Cover, DownloadMenu, Empty, ErrorBox, Section, Spinner } from '../components/Common'
+import { Cover, DownloadMenu, Empty, ErrorBox, QueueMenu, Section, Spinner } from '../components/Common'
 import { IconCheck, IconFolder, IconPlay, IconShield } from '../components/Icons'
 import { TrackTable } from '../components/TrackTable'
 
@@ -84,6 +84,7 @@ export function TrackPage() {
         <button className="play-btn big" onClick={() => usePlayer.getState().playList([track])} title={t('player.play')}><IconPlay /></button>
         <FavButton track={track} size={26} big />
         <DownloadMenu unavailableUntil={track.preRelease ? track.releaseDate : undefined} onDownload={(f, force) => void downloadTracks([track], f, force)} />
+        <QueueMenu tracks={[track]} playNextLabel={t('trackMenu.playNext')} addLabel={t('trackMenu.addToQueue')} />
         {status === 'downloaded' && <span className="progress-pill full"><IconCheck size={14} /> {t('status.downloaded')}</span>}
         {local && <button className="btn btn-ghost" onClick={() => void window.ss.shell.showItem(local)}><IconFolder size={16} /> {t('common.showInExplorer')}</button>}
       </div>

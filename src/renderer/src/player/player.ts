@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { errorMessage, releaseCover, similarTo, toTrack, type TrackLite } from '../lib/api'
 import { localFile, toast, useLibrary, useSettings } from '../lib/stores'
 import { t } from '../lib/i18n'
+import { clearUpcoming, firstAutoplayPos, insertAt, moveUpcoming, removeUpcoming } from './queueOps'
 import { trackerFinish, trackerSeeked, trackerStart, trackerTime } from './playTracker'
 
 type Repeat = 'off' | 'all' | 'one'
@@ -25,8 +26,14 @@ interface PlayerState {
   answerAutoplay(enable: boolean): void
   playList(tracks: TrackLite[], startIndex?: number): void
   jumpTo(pos: number): void
-  playNext(track: TrackLite): void
+  playNext(tracks: TrackLite | TrackLite[]): void
   addToQueue(tracks: TrackLite[]): void
+  /** Kommenden Track von Position `from` nach `to` verschieben (Positionen in order, beide nach pos) */
+  moveInQueue(from: number, to: number): void
+  /** Kommenden Track an Position `at` (in order) aus der Warteschlange entfernen */
+  removeFromQueue(at: number): void
+  /** Alle kommenden Tracks entfernen – der aktuelle läuft weiter, „Endlos hören“ übernimmt danach */
+  clearQueue(): void
   toggle(): void
   next(auto?: boolean): void
   prev(): void
@@ -190,21 +197,36 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     set({ pos })
     void load(queue[order[pos]])
   },
-  playNext(track) {
+  playNext(tracks) {
+    const list = Array.isArray(tracks) ? tracks : [tracks]
+    if (!list.length) return
     const { queue, order, pos, current } = get()
-    if (!current) return get().playList([track])
-    const q = [...queue, track]
-    const o = [...order]
-    o.splice(pos + 1, 0, q.length - 1)
-    set({ queue: q, order: o })
-    toast('info', t('player.playingNext', { title: track.title }))
+    if (!current) return get().playList(list)
+    set(insertAt(queue, order, pos + 1, list))
+    toast('info', list.length === 1 ? t('player.playingNext', { title: list[0].title }) : t('player.playingNextMany', { count: list.length }))
   },
   addToQueue(tracks) {
-    const { queue, order, current } = get()
+    if (!tracks.length) return
+    const { queue, order, pos, current } = get()
     if (!current) return get().playList(tracks)
-    const start = queue.length
-    set({ queue: [...queue, ...tracks], order: [...order, ...tracks.map((_, i) => start + i)] })
+    // Vor den automatisch angehängten „Endlos hören“-Tracks einreihen, nicht dahinter
+    set(insertAt(queue, order, firstAutoplayPos(queue, order, pos), tracks))
     toast('info', t('player.addedToQueue', { count: tracks.length }))
+  },
+  moveInQueue(from, to) {
+    const { queue, order, pos, shuffle } = get()
+    const r = moveUpcoming(queue, order, pos, from, to, shuffle)
+    if (r) set(r)
+  },
+  removeFromQueue(at) {
+    const { queue, order, pos, shuffle } = get()
+    const r = removeUpcoming(queue, order, pos, at, shuffle)
+    if (r) set(r)
+  },
+  clearQueue() {
+    const { queue, order, pos, shuffle } = get()
+    const r = clearUpcoming(queue, order, pos, shuffle)
+    if (r) set(r)
   },
   toggle() {
     const { current } = get()

@@ -151,7 +151,9 @@
     "playbackFailed": "Playback failed: {{error}}",
     "playingNext": "“{{title}}” will play next",
     "addedToQueue_one": "{{count}} track added to the queue",
-    "addedToQueue_other": "{{count}} tracks added to the queue"
+    "addedToQueue_other": "{{count}} tracks added to the queue",
+    "playingNextMany_one": "{{count}} track will play next",
+    "playingNextMany_other": "{{count}} tracks will play next"
   },
   "download": {
     "download": "Download",
@@ -221,7 +223,9 @@
     "moreFrom": "More from {{artist}}",
     "goToArtist": "Go to artist",
     "play": "Play “{{title}}”",
-    "noTracks": "This release has no playable tracks."
+    "noTracks": "This release has no playable tracks.",
+    "playNext": "Play release next",
+    "addToQueue": "Add release to queue"
   },
   "preRelease": {
     "badge": "Pre-release",
@@ -571,5 +575,12 @@
     "consentYes": "Yes, check for updates",
     "consentNo": "No",
     "consentHint": "You can change this anytime in the settings."
+  },
+  "playQueue": {
+    "clear": "Clear",
+    "clearHint": "Remove all upcoming tracks – the current one keeps playing",
+    "remove": "Remove from queue",
+    "upNext": "Next up",
+    "empty": "No more tracks in the queue."
   }
 }

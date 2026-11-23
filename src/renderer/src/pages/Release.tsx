@@ -9,7 +9,7 @@ import { fmtDate, fmtDuration } from '../lib/format'
 import { downloadRelease, releaseProgress, useLibrary } from '../lib/stores'
 import { usePlayer } from '../player/player'
 import { Grid, ReleaseCard } from '../components/Cards'
-import { Cover, DownloadMenu, ErrorBox, LoadMore, Section, Spinner } from '../components/Common'
+import { Cover, DownloadMenu, ErrorBox, LoadMore, QueueMenu, Section, Spinner } from '../components/Common'
 import { IconCheck, IconPlay } from '../components/Icons'
 import { TrackTable } from '../components/TrackTable'
 
@@ -63,6 +63,7 @@ export function ReleasePage() {
       <div className="actions">
         <button className="play-btn big" disabled={!tracks.length} onClick={() => usePlayer.getState().playList(tracks)} title={t('player.play')}><IconPlay /></button>
         <DownloadMenu label={t('download.release')} unavailableUntil={isPreRelease(r.ReleaseDate) ? r.ReleaseDate : undefined} onDownload={(f, force) => void downloadRelease(r.ID, f, force)} />
+        <QueueMenu tracks={tracks} playNextLabel={t('release.playNext')} addLabel={t('release.addToQueue')} />
         {prog.done > 0 && (
           <span className={`progress-pill ${prog.total && prog.done >= prog.total ? 'full' : ''}`}>
             <IconCheck size={14} /> {t('status.progressDownloaded', { done: prog.done, total: prog.total || tracks.length })}

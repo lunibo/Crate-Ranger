@@ -7,6 +7,12 @@ import './styles/app.css'
 import './lib/i18n'
 
 import { queryClient } from './lib/queryClient'
+import { persistQueries, restoreQueries } from './lib/queryPersist'
+
+// Gespeicherte Katalogdaten zuerst laden, damit die erste Seite ohne Netzwerk erscheint
+// (höchstens 1,5 s warten – hängt IndexedDB, startet die App eben ohne)
+await Promise.race([restoreQueries(queryClient), new Promise((r) => setTimeout(r, 1500))])
+persistQueries(queryClient)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

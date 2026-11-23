@@ -104,12 +104,12 @@ export class DownloadQueue {
   enqueue(tracks: EnqueueTrack[], format: DownloadFormat, force = false): number {
     let added = 0
     for (const t of tracks) {
-      const dup = this.jobs.find(
-        (j) => j.trackId === t.trackId && j.format === format && (j.status === 'queued' || ACTIVE.includes(j.status))
-      )
+      // Derselbe Track darf für mehrere Releases (Single + Album) in der Warteschlange stehen
+      const same = (j: DownloadJob): boolean => j.trackId === t.trackId && j.format === format && j.releaseId === t.releaseId
+      const dup = this.jobs.find((j) => same(j) && (j.status === 'queued' || ACTIVE.includes(j.status)))
       if (dup) continue
       // Frühere, abgeschlossene/fehlerhafte Einträge desselben Tracks ersetzen
-      this.jobs = this.jobs.filter((j) => !(j.trackId === t.trackId && j.format === format))
+      this.jobs = this.jobs.filter((j) => !same(j))
       this.jobs.push({
         id: randomUUID(),
         trackId: t.trackId,
@@ -182,7 +182,9 @@ export class DownloadQueue {
     if (this.retryAt && Date.now() < this.retryAt) return
     this.retryAt = undefined
     while (this.activeCount() < this.opts.concurrency()) {
-      const next = this.jobs.find((j) => j.status === 'queued')
+      // Nie denselben Track parallel laden: der zweite Job (anderes Release) wartet und kann danach kopiert werden
+      const busy = new Set(this.jobs.filter((j) => ACTIVE.includes(j.status)).map((j) => `${j.trackId}|${j.format}`))
+      const next = this.jobs.find((j) => j.status === 'queued' && !busy.has(`${j.trackId}|${j.format}`))
       if (!next) break
       void this.run(next)
     }

@@ -17,8 +17,9 @@ const GET_ALLOWED: RegExp[] = [
 const POST_ALLOWED: RegExp[] = [
   /^\/search\/(prompt|by-id)$/,
   /^\/me\/library\/track\/[\w-]+(\/delete)?$/,
-  // Playlist anlegen und Track hinzufügen (Track-Menü) – Löschen/Umbenennen bleibt gesperrt
+  // Eigene Playlists: anlegen, umbenennen, löschen, Track hinzufügen – Tracks entfernen/Mitglieder bleiben gesperrt
   /^\/playlist$/,
+  /^\/playlist\/[\w-]+(\/delete)?$/,
   /^\/playlist\/[\w-]+\/track$/
 ]
 

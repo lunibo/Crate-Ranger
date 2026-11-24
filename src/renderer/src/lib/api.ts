@@ -187,6 +187,10 @@ export const createPlaylist = async (name: string, isPublic = false): Promise<st
   (await post<{ ID: string }>('/playlist', { Name: name, Public: isPublic })).ID
 export const addToPlaylist = (playlistId: string, trackId: string): Promise<unknown> =>
   post(`/playlist/${playlistId}/track`, { TrackID: trackId })
+/** Umbenennen – `Public` wird mitgeschickt, damit die Sichtbarkeit unverändert bleibt */
+export const renamePlaylist = (id: string, name: string, isPublic: boolean): Promise<unknown> =>
+  post(`/playlist/${id}`, { Name: name, Public: isPublic })
+export const deletePlaylist = (id: string): Promise<unknown> => post(`/playlist/${id}/delete`)
 export const setFavorite = (trackId: string, fav: boolean): Promise<unknown> =>
   post(`/me/library/track/${trackId}${fav ? '' : '/delete'}`)
 

@@ -265,7 +265,16 @@
     "curated": "Kuratierte Playlists",
     "empty": "Diese Playlist ist leer.",
     "loadedDownloaded_one": "{{count}} der geladenen Tracks heruntergeladen",
-    "loadedDownloaded_other": "{{count}} der geladenen Tracks heruntergeladen"
+    "loadedDownloaded_other": "{{count}} der geladenen Tracks heruntergeladen",
+    "rename": "Umbenennen",
+    "renameSave": "Speichern",
+    "renamed": "Playlist in „{{name}}“ umbenannt",
+    "renameFailed": "Umbenennen fehlgeschlagen: {{error}}",
+    "delete": "Löschen",
+    "deleteConfirm": "Playlist „{{name}}“ löschen? Das lässt sich nicht rückgängig machen.",
+    "deleteStart": "Endgültig löschen",
+    "deleted": "Playlist „{{name}}“ gelöscht",
+    "deleteFailed": "Löschen fehlgeschlagen: {{error}}"
   },
   "similar": {
     "titleWith": "Ähnlich wie <link>„{{title}}“</link>",

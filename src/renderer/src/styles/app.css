@@ -613,3 +613,10 @@ kbd { font-family: inherit; font-size: 12px; border: 1px solid var(--line); bord
 .menu-form { display: flex; gap: 6px; padding: 4px; }
 .menu-form .input { flex: 1; min-width: 0; }
 .menu-scroll .menu-item.active { background: var(--bg-hover); }
+
+/* Eigene Playlists: umbenennen / löschen */
+.btn-danger { background: var(--danger); color: #1a0d0d; }
+.btn-danger:hover:not(:disabled) { background: #f48585; }
+.actions .notice.confirm { flex-basis: 100%; margin: 0; }
+.rename-form { display: flex; align-items: center; gap: 8px; margin: 4px 0 10px; flex-wrap: wrap; }
+.hero-title-input { font-size: 28px; font-weight: 800; padding: 6px 12px; flex: 1 1 280px; min-width: 0; }

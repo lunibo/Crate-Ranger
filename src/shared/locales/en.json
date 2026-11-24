@@ -265,7 +265,16 @@
     "curated": "Curated playlists",
     "empty": "This playlist is empty.",
     "loadedDownloaded_one": "{{count}} of the loaded tracks downloaded",
-    "loadedDownloaded_other": "{{count}} of the loaded tracks downloaded"
+    "loadedDownloaded_other": "{{count}} of the loaded tracks downloaded",
+    "rename": "Rename",
+    "renameSave": "Save",
+    "renamed": "Renamed playlist to “{{name}}”",
+    "renameFailed": "Couldn't rename: {{error}}",
+    "delete": "Delete",
+    "deleteConfirm": "Delete playlist “{{name}}”? This can't be undone.",
+    "deleteStart": "Delete permanently",
+    "deleted": "Deleted playlist “{{name}}”",
+    "deleteFailed": "Couldn't delete: {{error}}"
   },
   "similar": {
     "titleWith": "Similar to <link>“{{title}}”</link>",

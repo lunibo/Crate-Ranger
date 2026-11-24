@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { releaseCover } from '../lib/api'
@@ -12,6 +12,7 @@ import {
 import { Artists } from '../components/TrackTable'
 import { ArtistLinks, TrackLink } from '../components/ArtistLinks'
 import { FavButton } from '../components/FavButton'
+import { TrackMenu, type MenuPos } from '../components/TrackMenu'
 
 function Slider({ value, max, onChange, className }: { value: number; max: number; onChange: (v: number) => void; className?: string }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0
@@ -202,11 +203,20 @@ export function PlayerBar() {
   const p = usePlayer()
   const snap = useLibrary((s) => s.snap)
   const [showQueue, setShowQueue] = useState(false)
+  const [menu, setMenu] = useState<MenuPos | null>(null)
+  const closeMenu = useCallback(() => setMenu(null), [])
   const cur = p.current
   const status = cur ? trackStatus(snap, cur.trackId) : 'none'
   return (
     <footer className="playerbar">
-      <div className="pb-left">
+      <div
+        className="pb-left"
+        onContextMenu={(e) => {
+          if (!cur) return
+          e.preventDefault()
+          setMenu({ x: e.clientX, y: e.clientY })
+        }}
+      >
         {cur ? (
           <>
             <Link to={`/release/${cur.releaseId}`}><Cover src={releaseCover(cur.releaseId, 128)} alt={cur.title} size={56} /></Link>
@@ -258,6 +268,7 @@ export function PlayerBar() {
         <Slider value={p.muted ? 0 : p.volume} max={1} onChange={p.setVolume} className="vol" />
       </div>
       {showQueue && <QueuePanel />}
+      {menu && cur && <TrackMenu key={cur.trackId} track={cur} at={menu} onClose={closeMenu} />}
     </footer>
   )
 }

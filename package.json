@@ -1,7 +1,7 @@
 {
   "name": "crate-ranger",
   "productName": "Crate Ranger",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Crate Ranger – inoffizieller Desktop-Client für SoundScout mit Streaming, Download, Tagging und Bibliotheksverwaltung",
   "main": "./out/main/index.js",
   "author": "Crate Ranger",

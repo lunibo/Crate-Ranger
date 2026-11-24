@@ -1,5 +1,5 @@
 import type { PlayRecord } from '@shared/types'
-import type { TrackLite } from '../lib/api'
+import { artistsForTracks, type TrackLite } from '../lib/api'
 
 /**
  * Misst, wie lange ein Track tatsächlich gehört wurde (ohne Spulen/Pausen), und meldet
@@ -43,6 +43,16 @@ export function trackerStart(track: TrackLite, source: 'stream' | 'local', curre
       done: false,
       skip: false
     }
+  }
+  // Manche Quellen (Namenssuche, lokale Bibliothek) liefern keine Artist-IDs → nachladen, sonst
+  // taucht der Artist im Field Report doppelt auf (einmal mit, einmal ohne ID)
+  if (!track.artists.length) {
+    const rec = session.rec
+    artistsForTracks([track.trackId])
+      .then((r) => {
+        if (r[track.trackId]?.length && !rec.ar.length) rec.ar = r[track.trackId]
+      })
+      .catch(() => {})
   }
 }
 

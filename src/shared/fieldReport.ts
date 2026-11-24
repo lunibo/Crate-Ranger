@@ -129,6 +129,26 @@ const TEMPO = [
   { label: '160+', from: 160, to: 1000 }
 ]
 
+type Credit = PlayRecord['ar'][number]
+const SPLIT_RE = /\s+(?:feat\.?|ft\.?|featuring|&|x|vs\.?)\s+|\s*,\s*/i
+
+/**
+ * Liefert die Artists einer Wiedergabe. Ältere/lückenhafte Datensätze haben keine Artist-IDs (nur den
+ * Anzeigetitel) → über den Namen einem bekannten Artist zuordnen, damit er nicht doppelt gezählt wird.
+ */
+function creditResolver(all: PlayRecord[]): (p: PlayRecord) => Credit[] {
+  const byName = new Map<string, Credit>()
+  for (const p of all) for (const a of p.ar) if (a.id && !byName.has(a.name.toLowerCase())) byName.set(a.name.toLowerCase(), a)
+  return (p) => {
+    if (p.ar.length) return p.ar
+    const whole = byName.get(p.a.trim().toLowerCase())
+    if (whole) return [whole]
+    const parts = p.a.split(SPLIT_RE).map((x) => byName.get(x.trim().toLowerCase()))
+    if (parts.length > 1 && parts.every(Boolean)) return [...new Map(parts.map((a) => [a!.id, a!])).values()]
+    return [{ id: '', name: p.a, uri: '' }]
+  }
+}
+
 const minutesOf = (ms: number): number => ms / 60_000
 const sumBy = <T>(xs: T[], f: (x: T) => number): number => xs.reduce((n, x) => n + f(x), 0)
 
@@ -157,6 +177,7 @@ export function computeFieldReport(data: StatsData, period: Period, tagCategorie
   const releases = new Map<string, RankedRelease & { ms: number }>()
   const genres = new Map<string, number>()
   const moods = new Map<string, number>()
+  const creditsOf = creditResolver(data.plays)
   const brands = new Map<string, number>()
   for (const p of plays) {
     const isPlay = p.ms >= COUNTED_PLAY_MS ? 1 : 0
@@ -168,8 +189,7 @@ export function computeFieldReport(data: StatsData, period: Period, tagCategorie
     rel.plays += isPlay
     rel.ms += p.ms
     releases.set(p.r, rel)
-    const credited = p.ar.length ? p.ar : [{ id: '', name: p.a, uri: '' }]
-    for (const a of credited) {
+    for (const a of creditsOf(p)) {
       const key = a.id || a.name.toLowerCase()
       const ar = artists.get(key) ?? { id: a.id, name: a.name, uri: a.uri, plays: 0, minutes: 0, ms: 0 }
       ar.plays += isPlay
@@ -249,7 +269,7 @@ export function computeFieldReport(data: StatsData, period: Period, tagCategorie
   // ---------- Entdeckungen: Artists, die vor dem Zeitraum nie gehört wurden ----------
   const firstSeen = new Map<string, number>()
   for (const p of data.plays) {
-    for (const a of p.ar.length ? p.ar : [{ id: '', name: p.a, uri: '' }]) {
+    for (const a of creditsOf(p)) {
       const key = a.id || a.name.toLowerCase()
       firstSeen.set(key, Math.min(firstSeen.get(key) ?? Infinity, p.at))
     }

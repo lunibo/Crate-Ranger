@@ -1,5 +1,5 @@
 import { stripFeaturing } from '@shared/artists'
-import type { CatalogTrack, ReleaseArtist } from '@shared/types'
+import type { ArtistRef, CatalogTrack, ReleaseArtist } from '@shared/types'
 
 /** Normalisierte Metadaten eines Tracks – Grundlage für Dateipfad und Tags. */
 export interface TrackMeta {
@@ -9,6 +9,8 @@ export interface TrackMeta {
   version: string
   artistsTitle: string
   artists: string[]
+  /** Artists mit IDs, gleiche Reihenfolge wie `artists` – leer, wenn SoundScout keine IDs liefert */
+  artistRefs: ArtistRef[]
   releaseArtist: string
   /** Release-Artist ohne Featured-Artists („Stonebank feat. EMEL“ → „Stonebank“) – für Ordnernamen */
   folderArtist: string
@@ -122,6 +124,15 @@ export function buildTrackMeta(
   const artists = t.Artists?.length
     ? uniq(t.Artists.map((a) => a.Name))
     : uniq([t.ArtistsTitle])
+  const artistRefs: ArtistRef[] = []
+  for (const name of t.Artists?.length ? artists : []) {
+    const a = t.Artists!.find((x) => x.Name.trim() === name && x.ID)
+    if (!a) {
+      artistRefs.length = 0 // nur vollständig zuordenbar schreiben, sonst passen ARTISTS und IDs nicht zusammen
+      break
+    }
+    artistRefs.push({ id: a.ID, name, uri: a.URL ?? '' })
+  }
   const primaryReleaseArtists = (opts.releaseArtists ?? [])
     .filter((a) => a.Role === 'Primary')
     .sort((a, b) => a.ArtistNumber - b.ArtistNumber)
@@ -135,6 +146,7 @@ export function buildTrackMeta(
     version: t.Version?.trim() ?? '',
     artistsTitle: t.ArtistsTitle?.trim() ?? '',
     artists,
+    artistRefs,
     releaseArtist: releaseArtist.trim(),
     folderArtist: mainArtist(releaseArtist, opts.releaseArtists),
     releaseTitle: (t.ReleaseTitle ?? '').trim(),

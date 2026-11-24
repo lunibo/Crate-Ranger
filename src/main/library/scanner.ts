@@ -44,6 +44,7 @@ export async function scanFolder(root: string, store: LibraryStore): Promise<Sca
           releaseId: ids.releaseId || found?.releaseId || '',
           title: known?.title || ids.title,
           artist: known?.artist || ids.artist,
+          artists: known?.artists?.length ? known.artists : ids.artists,
           releaseTitle: known?.releaseTitle || ids.album,
           releaseArtist: known?.releaseArtist || ids.albumArtist,
           trackNumber: known?.trackNumber || ids.track

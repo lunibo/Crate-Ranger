@@ -15,7 +15,7 @@ import { IconAlert, IconFolder, IconPlay, IconRefresh } from '../components/Icon
 
 function libToTrack(t: LibraryTrack): TrackLite {
   return {
-    trackId: t.trackId, releaseId: t.releaseId, title: t.title, version: '', artistsTitle: t.artist, artists: [],
+    trackId: t.trackId, releaseId: t.releaseId, title: t.title, version: '', artistsTitle: t.artist, artists: t.artists ?? [],
     releaseTitle: t.releaseTitle, releaseArtist: t.releaseArtist, releaseDate: '', releaseType: '', coverFileId: '',
     duration: 0, bpm: 0, genres: [], tags: [], creatorSafe: false, explicit: false, favorite: false, brand: '', trackNumber: t.trackNumber, preRelease: false
   }
@@ -165,7 +165,7 @@ export function LibraryView() {
                           <div key={tr.trackId} className={`lib-track ${file?.missing ? 'missing' : ''}`}>
                             <span className="n">{String(tr.trackNumber).padStart(2, '0')}</span>
                             <span className="t"><TrackLink trackId={tr.trackId} title={tr.title} /></span>
-                            <span className="muted">{tr.artist !== tr.releaseArtist ? <ArtistLinks text={tr.artist} trackId={tr.trackId} /> : ''}</span>
+                            <span className="muted">{tr.artist !== tr.releaseArtist ? <ArtistLinks artists={tr.artists} text={tr.artist} trackId={tr.trackId} /> : ''}</span>
                             <span className="fmt">{tr.files.map((f) => FORMAT_LABEL[f.format]).join(', ')}</span>
                             <span className="muted">{file ? fmtBytes(file.size) : ''}</span>
                             {file?.missing ? (

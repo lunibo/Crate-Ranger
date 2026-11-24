@@ -94,6 +94,7 @@ export async function downloadTrack(deps: DownloaderDeps, job: DownloadJob, ctx:
         releaseId: meta.releaseId,
         title: meta.version ? `${meta.title} (${meta.version})` : meta.title,
         artist: meta.artistsTitle,
+        artists: meta.artistRefs,
         releaseTitle: meta.releaseTitle,
         releaseArtist: meta.releaseArtist,
         trackNumber: meta.trackNumber

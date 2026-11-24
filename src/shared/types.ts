@@ -222,6 +222,13 @@ export interface UpdateState {
 
 // ---------- Hörstatistiken (lokal) ----------
 
+/** Artist mit SoundScout-ID und URI (für Links/Bilder). */
+export interface ArtistRef {
+  id: string
+  name: string
+  uri: string
+}
+
 /** Eine Wiedergabe – kompakt gespeichert (eine JSON-Zeile pro Wiedergabe). */
 export interface PlayRecord {
   id: string
@@ -236,7 +243,7 @@ export interface PlayRecord {
   ti: string
   v: string
   a: string
-  ar: { id: string; name: string; uri: string }[]
+  ar: ArtistRef[]
   al: string
   g: string[]
   tg: string[]
@@ -380,6 +387,8 @@ export interface LibraryTrack {
   releaseId: string
   title: string
   artist: string
+  /** Einzelne Artists mit IDs (fehlt bei älteren Einträgen und Dateien ohne SOUNDSCOUT_ARTIST_ID) */
+  artists?: ArtistRef[]
   releaseTitle: string
   releaseArtist: string
   trackNumber: number

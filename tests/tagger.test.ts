@@ -62,3 +62,28 @@ describe.skipIf(!has('ffmpeg'))('tagger on generated MP3/WAV', () => {
     })
   }
 })
+
+describe.skipIf(!has('ffmpeg'))('Artist-IDs in Datei-Tags', () => {
+  const duo = buildTrackMeta({
+    ...(focus as CatalogTrack),
+    ArtistsTitle: 'Slushii & Tokyo Machine',
+    Artists: [
+      { ID: 'id-slushii', Name: 'Slushii', URL: 'slushii', Role: 'Primary' },
+      { ID: 'id-tm', Name: 'Tokyo Machine', URL: 'tokyomachine', Role: 'Primary' }
+    ]
+  })
+  for (const ext of ['flac', 'mp3', 'wav']) {
+    it(`schreibt und liest mehrere Artists mit IDs (${ext})`, () => {
+      const f = join(dir, `duo.${ext}`)
+      execFileSync('ffmpeg', ['-v', 'quiet', '-y', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=1', f])
+      writeTags(f, duo, null)
+      expect(readSoundScoutIds(f)?.artists).toEqual([
+        { id: 'id-slushii', name: 'Slushii', uri: 'slushii' },
+        { id: 'id-tm', name: 'Tokyo Machine', uri: 'tokyomachine' }
+      ])
+      // Ohne IDs (z.B. Fallback auf ArtistsTitle) → Felder werden beim Neu-Taggen entfernt
+      writeTags(f, { ...duo, artistRefs: [] }, null)
+      expect(readSoundScoutIds(f)?.artists).toEqual([])
+    })
+  }
+})

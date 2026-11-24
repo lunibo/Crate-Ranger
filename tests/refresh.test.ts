@@ -9,6 +9,7 @@ import { DEFAULT_PATH_TEMPLATE } from '@shared/types'
 import { buildTrackMeta, type TrackMeta } from '../src/main/downloads/meta'
 import { writeTags } from '../src/main/downloads/tagger'
 import { LibraryStore } from '../src/main/library/store'
+import { scanFolder } from '../src/main/library/scanner'
 
 // cover.ts nutzt Electrons nativeImage – im Test nicht nötig (cover.jpg wird aus dem alten Ordner übernommen)
 vi.mock('electron', () => ({ nativeImage: { createFromBuffer: () => ({ isEmpty: () => true }) } }))
@@ -61,6 +62,13 @@ describe.skipIf(!has('ffmpeg'))('refreshLibrary', () => {
     expect(tf.tag.pictures).toHaveLength(1) // Cover bleibt erhalten
     tf.dispose()
     expect(progress).toHaveBeenLastCalledWith(expect.objectContaining({ done: 1, total: 1 }))
+    // Alter Index-Eintrag ohne Artist-IDs bekommt sie beim Aktualisieren
+    const shingo = [{ id: '47c6008f-910f-4b05-a65b-e193925ede9c', name: 'Shingo Nakamura', uri: 'shingo-nakamura' }]
+    expect(library.getTrack('t-stronger')?.artists).toEqual(shingo)
+    // … und ein neu aufgebauter Index (Ordner-Scan) liest sie aus der Datei
+    const rescanned = new LibraryStore(join(root, 'library-rescan.json'))
+    await scanFolder(root, rescanned)
+    expect(rescanned.getTrack('t-stronger')?.artists).toEqual(shingo)
   })
 
   it('never overwrites a different file and leaves unrelated files alone', async () => {

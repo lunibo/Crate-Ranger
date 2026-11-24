@@ -13,6 +13,7 @@ import {
   TagTypes,
   XiphComment
 } from 'node-taglib-sharp'
+import type { ArtistRef } from '@shared/types'
 import type { TrackMeta } from './meta'
 import { withVersion } from './meta'
 
@@ -39,6 +40,9 @@ export function customFields(m: TrackMeta, keepEmpty = false): Record<string, st
     ITUNESADVISORY: [m.explicit ? '1' : '0'],
     SOUNDSCOUT_TRACK_ID: [m.trackId],
     SOUNDSCOUT_RELEASE_ID: [m.releaseId],
+    // Je ein Wert pro Eintrag in ARTISTS (gleiche Reihenfolge), damit der Ordner-Scan Artists mit IDs kennt
+    SOUNDSCOUT_ARTIST_ID: m.artistRefs.map((a) => a.id),
+    SOUNDSCOUT_ARTIST_URI: m.artistRefs.map((a) => a.uri),
     SOUNDSCOUT_CREATOR_SAFE: [m.creatorSafe ? '1' : '0'],
     SOUNDSCOUT_PERFORMANCE: m.performanceType ? [m.performanceType] : [],
     SOUNDSCOUT_USAGES: m.usages,
@@ -158,28 +162,39 @@ export function readEmbeddedPicture(path: string): CoverImage | null {
   }
 }
 
+/** ARTISTS + SOUNDSCOUT_ARTIST_ID/_URI wieder zusammensetzen (nur wenn die Listen zueinander passen). */
+function zipArtists(names: string[], ids: string[], uris: string[]): ArtistRef[] {
+  if (!ids.length || names.length !== ids.length) return []
+  return names.map((name, i) => ({ id: ids[i], name, uri: uris.length === ids.length ? uris[i] : '' }))
+}
+
 /** Liest die eingebettete SoundScout-Track-ID (für den Ordner-Scan). */
-export function readSoundScoutIds(path: string): { trackId: string; releaseId: string; title: string; artist: string; album: string; albumArtist: string; track: number } | null {
+export function readSoundScoutIds(path: string): { trackId: string; releaseId: string; title: string; artist: string; artists: ArtistRef[]; album: string; albumArtist: string; track: number } | null {
   const file = TagFile.createFromPath(path)
   try {
     let trackId = ''
     let releaseId = ''
+    let artists: ArtistRef[] = []
     const x = file.getTag(TagTypes.Xiph, false) as XiphComment | undefined
     if (x) {
       trackId = x.getFieldFirstValue('SOUNDSCOUT_TRACK_ID') ?? ''
       releaseId = x.getFieldFirstValue('SOUNDSCOUT_RELEASE_ID') ?? ''
+      artists = zipArtists(x.getField('ARTISTS'), x.getField('SOUNDSCOUT_ARTIST_ID'), x.getField('SOUNDSCOUT_ARTIST_URI'))
     }
     const id3 = file.getTag(TagTypes.Id3v2, false) as Id3v2Tag | undefined
     if (!trackId && id3) {
       const frames = id3.getFramesByClassType<Id3v2UserTextInformationFrame>(Id3v2FrameClassType.UserTextInformationFrame)
-      trackId = Id3v2UserTextInformationFrame.findUserTextInformationFrame(frames, 'SOUNDSCOUT_TRACK_ID', false)?.text[0] ?? ''
-      releaseId = Id3v2UserTextInformationFrame.findUserTextInformationFrame(frames, 'SOUNDSCOUT_RELEASE_ID', false)?.text[0] ?? ''
+      const txxx = (desc: string): string[] => Id3v2UserTextInformationFrame.findUserTextInformationFrame(frames, desc, false)?.text ?? []
+      trackId = txxx('SOUNDSCOUT_TRACK_ID')[0] ?? ''
+      releaseId = txxx('SOUNDSCOUT_RELEASE_ID')[0] ?? ''
+      artists = zipArtists(txxx('ARTISTS'), txxx('SOUNDSCOUT_ARTIST_ID'), txxx('SOUNDSCOUT_ARTIST_URI'))
     }
     if (!trackId) return null
     const t = file.tag
     return {
       trackId,
       releaseId,
+      artists,
       title: t.title ?? '',
       artist: t.performers[0] ?? '',
       album: t.album ?? '',

@@ -8,6 +8,7 @@ import { fmtDateTime } from '../lib/format'
 import { queryClient } from '../lib/queryClient'
 import { downloadTracks, localFile, toast, useAuth, useLibrary } from '../lib/stores'
 import { usePlayer } from '../player/player'
+import { filterPlaylists, fold } from '@shared/playlistSearch'
 
 export type MenuPos = { x: number; y: number }
 type View = 'main' | 'playlists' | 'create'
@@ -33,10 +34,17 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
   const [pos, setPos] = useState(at)
   const [view, setView] = useState<View>('main')
   const [name, setName] = useState('')
+  const [query, setQuery] = useState('')
+  const [active, setActive] = useState(0)
   const [busy, setBusy] = useState(false)
   const lists = useQuery({ queryKey: ['my-playlists'], queryFn: myPlaylists, enabled: loggedIn && view === 'playlists' })
   // Favoriten sind intern auch eine Playlist – dafür gibt es das Herz
   const own = (lists.data?.Data ?? []).filter((p) => !p.IsFavorite)
+  const matches = filterPlaylists(own, query)
+  const exact = own.some((p) => fold(p.Name) === fold(query))
+  const activeRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => setActive(0), [query])
+  useEffect(() => activeRef.current?.scrollIntoView({ block: 'nearest' }), [active])
 
   useEffect(() => {
     const close = (e: MouseEvent): void => {
@@ -70,7 +78,7 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
       x: Math.max(m, Math.min(at.x, window.innerWidth - width - m)),
       y: at.y + height + m > window.innerHeight ? Math.max(m, at.y - height) : at.y
     })
-  }, [at, view, own.length, lists.isLoading])
+  }, [at, view, matches.length, lists.isLoading])
 
   const act = (fn: () => void) => () => {
     fn()
@@ -90,8 +98,8 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
     }
   }
 
-  const create = async (): Promise<void> => {
-    const n = name.trim()
+  const create = async (newName = name): Promise<void> => {
+    const n = newName.trim()
     if (!n || busy) return
     setBusy(true)
     let id: string
@@ -124,7 +132,34 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
     content = (
       <>
         {back('main')}
-        <button className="menu-item" onClick={() => setView('create')}>+ {t('playlistMenu.create')}</button>
+        <div className="menu-form">
+          <input
+            className="input"
+            autoFocus
+            placeholder={t('playlistMenu.search')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault()
+                const d = e.key === 'ArrowDown' ? 1 : -1
+                setActive((i) => (matches.length ? (i + d + matches.length) % matches.length : 0))
+              } else if (e.key === 'Enter') {
+                e.preventDefault()
+                const p = matches[active]
+                if (p && !busy) void addTo(p.ID, p.Name)
+                else if (query.trim() && !exact) void create(query)
+              }
+            }}
+          />
+        </div>
+        {query.trim() && !exact ? (
+          <button className="menu-item" disabled={busy} onClick={() => void create(query)}>
+            + {t('playlistMenu.createNamed', { name: query.trim() })}
+          </button>
+        ) : (
+          <button className="menu-item" onClick={() => { setName(query); setView('create') }}>+ {t('playlistMenu.create')}</button>
+        )}
         <div className="menu-sep" />
         <div className="menu-scroll">
           {lists.isLoading ? (
@@ -133,9 +168,18 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
             <div className="menu-item disabled">{t('playlistMenu.loadFailed')}</div>
           ) : own.length === 0 ? (
             <div className="menu-item disabled">{t('playlistMenu.empty')}</div>
+          ) : matches.length === 0 ? (
+            <div className="menu-item disabled">{t('playlistMenu.noMatch')}</div>
           ) : (
-            own.map((p) => (
-              <button key={p.ID} className="menu-item" disabled={busy} onClick={() => void addTo(p.ID, p.Name)}>
+            matches.map((p, i) => (
+              <button
+                key={p.ID}
+                ref={i === active ? activeRef : undefined}
+                className={`menu-item ${i === active ? 'active' : ''}`}
+                disabled={busy}
+                onMouseEnter={() => setActive(i)}
+                onClick={() => void addTo(p.ID, p.Name)}
+              >
                 {p.Name}
               </button>
             ))

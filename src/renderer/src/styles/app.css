@@ -612,3 +612,4 @@ kbd { font-family: inherit; font-size: 12px; border: 1px solid var(--line); bord
 .menu-item:disabled { opacity: .6; cursor: default; }
 .menu-form { display: flex; gap: 6px; padding: 4px; }
 .menu-form .input { flex: 1; min-width: 0; }
+.menu-scroll .menu-item.active { background: var(--bg-hover); }

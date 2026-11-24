@@ -86,10 +86,24 @@
   "trackMenu": {
     "playNext": "Play next",
     "addToQueue": "Add to queue",
+    "addToPlaylist": "Add to playlist",
     "similar": "Similar tracks",
     "details": "Track details",
     "goToRelease": "Go to release",
-    "openOnSoundScout": "Open on SoundScout"
+    "openOnSoundScout": "Open on SoundScout",
+    "back": "Back"
+  },
+  "playlistMenu": {
+    "create": "New playlist",
+    "namePlaceholder": "Playlist name",
+    "createButton": "Create",
+    "loading": "Loading playlists…",
+    "empty": "No playlists of your own yet",
+    "loadFailed": "Couldn't load playlists",
+    "added": "Added “{{title}}” to “{{playlist}}”",
+    "addFailed": "Couldn't add to “{{playlist}}”: {{error}}",
+    "created": "Created playlist “{{playlist}}” and added “{{title}}”",
+    "createFailed": "Couldn't create the playlist: {{error}}"
   },
   "track": {
     "kind": "Song",

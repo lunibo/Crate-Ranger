@@ -603,3 +603,12 @@ kbd { font-family: inherit; font-size: 12px; border: 1px solid var(--line); bord
 .update-pill:hover { background: rgba(54,214,180,.18); }
 .update-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
 .update-error { color: var(--warn); }
+
+/* Track-Menü: Untermenü „Zur Playlist hinzufügen“ */
+.menu-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.menu-arrow { color: var(--text-3); }
+.menu-back { color: var(--text-2); }
+.menu-scroll { max-height: 280px; overflow-y: auto; }
+.menu-item:disabled { opacity: .6; cursor: default; }
+.menu-form { display: flex; gap: 6px; padding: 4px; }
+.menu-form .input { flex: 1; min-width: 0; }

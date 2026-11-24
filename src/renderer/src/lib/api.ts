@@ -182,6 +182,11 @@ export const playlist = (id: string): Promise<Playlist> => get(`/playlist/${id}`
 export const playlistTracks = (id: string, offset = 0, limit = 50): Promise<ListResponse<PlaylistItem>> =>
   get(`/playlist/${id}/tracks`, { sort: 'Sort', offset, limit })
 export const favoritesPlaylist = (): Promise<Playlist> => get('/me/library')
+/** Neue Playlist anlegen (wie im SoundScout-Web-Player standardmäßig privat) → ID */
+export const createPlaylist = async (name: string, isPublic = false): Promise<string> =>
+  (await post<{ ID: string }>('/playlist', { Name: name, Public: isPublic })).ID
+export const addToPlaylist = (playlistId: string, trackId: string): Promise<unknown> =>
+  post(`/playlist/${playlistId}/track`, { TrackID: trackId })
 export const setFavorite = (trackId: string, fav: boolean): Promise<unknown> =>
   post(`/me/library/track/${trackId}${fav ? '' : '/delete'}`)
 

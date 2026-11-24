@@ -14,7 +14,13 @@ const GET_ALLOWED: RegExp[] = [
   /^\/me\/library$/
 ]
 
-const POST_ALLOWED: RegExp[] = [/^\/search\/(prompt|by-id)$/, /^\/me\/library\/track\/[\w-]+(\/delete)?$/]
+const POST_ALLOWED: RegExp[] = [
+  /^\/search\/(prompt|by-id)$/,
+  /^\/me\/library\/track\/[\w-]+(\/delete)?$/,
+  // Playlist anlegen und Track hinzufügen (Track-Menü) – Löschen/Umbenennen bleibt gesperrt
+  /^\/playlist$/,
+  /^\/playlist\/[\w-]+\/track$/
+]
 
 export function assertAllowed(method: 'GET' | 'POST', path: unknown): string {
   if (typeof path !== 'string' || path.length > 300 || path.includes('..') || path.includes('?')) {

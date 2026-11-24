@@ -1,5 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -9,8 +8,9 @@ import { queryClient } from '../lib/queryClient'
 import { downloadTracks, localFile, toast, useAuth, useLibrary } from '../lib/stores'
 import { usePlayer } from '../player/player'
 import { filterPlaylists, fold } from '@shared/playlistSearch'
+import { PopupMenu, type MenuPos } from './PopupMenu'
 
-export type MenuPos = { x: number; y: number }
+export type { MenuPos }
 type View = 'main' | 'playlists' | 'create'
 
 function refreshPlaylist(id: string): void {
@@ -25,13 +25,11 @@ function refreshPlaylist(id: string): void {
  */
 export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuPos; onClose: () => void }) {
   const { t } = useTranslation()
-  const ref = useRef<HTMLDivElement>(null)
   const nav = useNavigate()
   const player = usePlayer()
   const snap = useLibrary((s) => s.snap)
   const loggedIn = useAuth((s) => !!s.state?.loggedIn)
   const local = localFile(snap, track.trackId)
-  const [pos, setPos] = useState(at)
   const [view, setView] = useState<View>('main')
   const [name, setName] = useState('')
   const [query, setQuery] = useState('')
@@ -45,40 +43,6 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
   const activeRef = useRef<HTMLButtonElement>(null)
   useEffect(() => setActive(0), [query])
   useEffect(() => activeRef.current?.scrollIntoView({ block: 'nearest' }), [active])
-
-  useEffect(() => {
-    const close = (e: MouseEvent): void => {
-      if (!ref.current?.contains(e.target as Node)) onClose()
-    }
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose()
-    }
-    const onScroll = (e: Event): void => {
-      if (!ref.current?.contains(e.target as Node)) onClose()
-    }
-    window.addEventListener('mousedown', close)
-    window.addEventListener('keydown', onKey)
-    window.addEventListener('blur', onClose)
-    window.addEventListener('resize', onClose)
-    if (at) window.addEventListener('scroll', onScroll, true)
-    return () => {
-      window.removeEventListener('mousedown', close)
-      window.removeEventListener('keydown', onKey)
-      window.removeEventListener('blur', onClose)
-      window.removeEventListener('resize', onClose)
-      window.removeEventListener('scroll', onScroll, true)
-    }
-  }, [onClose, at])
-  // Kontextmenü im Fenster halten (nach rechts/unten nicht abschneiden) – auch wenn sich der Inhalt ändert
-  useLayoutEffect(() => {
-    if (!at || !ref.current) return
-    const { width, height } = ref.current.getBoundingClientRect()
-    const m = 8
-    setPos({
-      x: Math.max(m, Math.min(at.x, window.innerWidth - width - m)),
-      y: at.y + height + m > window.innerHeight ? Math.max(m, at.y - height) : at.y
-    })
-  }, [at, view, matches.length, lists.isLoading])
 
   const act = (fn: () => void) => () => {
     fn()
@@ -248,18 +212,9 @@ export function TrackMenu({ track, at, onClose }: { track: TrackLite; at?: MenuP
     )
   }
 
-  const body = (
-    <div
-      className={`menu ${at ? 'context-menu' : 'row-menu'}`}
-      ref={ref}
-      style={pos ? { left: pos.x, top: pos.y } : undefined}
-      onClick={(e) => e.stopPropagation()}
-      onDoubleClick={(e) => e.stopPropagation()}
-      onContextMenu={(e) => { e.preventDefault(); e.stopPropagation() }}
-      role="menu"
-    >
+  return (
+    <PopupMenu at={at} onClose={onClose} relayout={[view, matches.length, lists.isLoading]}>
       {content}
-    </div>
+    </PopupMenu>
   )
-  return at ? createPortal(body, document.body) : body
 }

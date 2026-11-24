@@ -1,5 +1,8 @@
+import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { CoverPlayButton } from './CoverPlayButton'
+import { CoverPlayButton, PlaylistPlayButton } from './CoverPlayButton'
+import { PlaylistMenu } from './PlaylistMenu'
+import type { MenuPos } from './PopupMenu'
 import { PreReleaseBadge } from './PreReleaseBadge'
 import { isPreRelease } from '@shared/release'
 import { useTranslation } from 'react-i18next'
@@ -52,15 +55,32 @@ export function ArtistCard({ a }: { a: Artist }) {
   )
 }
 
-export function PlaylistCard({ p }: { p: Playlist }) {
+/** Playlist-Karte: Klick öffnet, Play-Button beim Überfahren, Rechtsklick → Menü (`own`: mit Umbenennen/Löschen). */
+export function PlaylistCard({ p, own = false }: { p: Playlist; own?: boolean }) {
   const { t } = useTranslation()
+  const nav = useNavigate()
+  const [menu, setMenu] = useState<MenuPos | null>(null)
+  const closeMenu = useCallback(() => setMenu(null), [])
   const img = p.CoverImageIDs?.[0]
   return (
-    <Link to={`/playlist/${p.ID}`} className="card">
-      <Cover src={img ? fileCover(img, 300) : undefined} alt={p.Name} />
-      <div className="card-title">{p.Name}</div>
+    <div
+      className={`card clickable ${menu ? 'ctx' : ''}`}
+      onClick={() => nav(`/playlist/${p.ID}`)}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        setMenu({ x: e.clientX, y: e.clientY })
+      }}
+    >
+      <div className="card-cover">
+        <Cover src={img ? fileCover(img, 300) : undefined} alt={p.Name} />
+        <PlaylistPlayButton playlistId={p.ID} title={p.Name} />
+      </div>
+      <div className="card-title" title={p.Name}>
+        <Link to={`/playlist/${p.ID}`} onClick={(e) => e.stopPropagation()}>{p.Name}</Link>
+      </div>
       <div className="card-sub">{p.Public ? t('playlist.public') : t('playlist.private')}{p.FollowerCount ? ` · ${t('playlist.followers', { count: p.FollowerCount })}` : ''}</div>
-    </Link>
+      {menu && <PlaylistMenu p={p} own={own} at={menu} onClose={closeMenu} />}
+    </div>
   )
 }
 

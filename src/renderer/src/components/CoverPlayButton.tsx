@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { errorMessage, releaseTracks, toTrack } from '../lib/api'
 import { queryClient } from '../lib/queryClient'
 import { toast } from '../lib/stores'
+import { playPlaylist } from '../lib/playlistActions'
 import { usePlayer } from '../player/player'
 import { IconPause, IconPlay } from './Icons'
 
@@ -50,6 +51,33 @@ export function CoverPlayButton({ releaseId, title }: { releaseId: string; title
       title={label}
     >
       {loading ? <span className="spinner small" /> : active ? <IconPause size={22} /> : <IconPlay size={22} />}
+    </button>
+  )
+}
+
+/** Runder Play-Button auf einem Playlist-Cover (erscheint beim Überfahren) – startet die ganze Playlist. */
+export function PlaylistPlayButton({ playlistId, title }: { playlistId: string; title: string }) {
+  const { t } = useTranslation()
+  const [loading, setLoading] = useState(false)
+  const label = t('playlist.playTitle', { title })
+  const onClick = async (e: React.MouseEvent): Promise<void> => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (loading) return
+    setLoading(true)
+    await playPlaylist(playlistId)
+    setLoading(false)
+  }
+  return (
+    <button
+      type="button"
+      className="cover-play"
+      onClick={(e) => void onClick(e)}
+      onDoubleClick={(e) => e.stopPropagation()}
+      aria-label={label}
+      title={label}
+    >
+      {loading ? <span className="spinner small" /> : <IconPlay size={22} />}
     </button>
   )
 }

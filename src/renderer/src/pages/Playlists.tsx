@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { allPlaylistTracks, deletePlaylist, errorMessage, favoritesPlaylist, fileCover, memberPlaylists, myPlaylists, playlist, playlistTracks, publicPlaylists, renamePlaylist, similarTo, toTrack } from '../lib/api'
+import { allPlaylistTracks, favoritesPlaylist, fileCover, memberPlaylists, myPlaylists, playlist, playlistTracks, publicPlaylists, similarTo, toTrack } from '../lib/api'
 import type { Playlist } from '@shared/types'
-import { queryClient } from '../lib/queryClient'
+import { deleteOwnPlaylist, renameOwnPlaylist } from '../lib/playlistActions'
+import { filterPlaylists } from '@shared/playlistSearch'
 import { downloadPlaylist, toast, useAuth, useLibrary } from '../lib/stores'
 import { usePlayer } from '../player/player'
 import { Grid, PlaylistCard } from '../components/Cards'
@@ -15,56 +16,62 @@ import { TrackTable } from '../components/TrackTable'
 export function PlaylistsPage() {
   const { t } = useTranslation()
   const loggedIn = useAuth((s) => !!s.state?.loggedIn)
+  const [query, setQuery] = useState('')
   const mine = useQuery({ queryKey: ['my-playlists'], queryFn: myPlaylists, enabled: loggedIn })
   const member = useQuery({ queryKey: ['member-playlists'], queryFn: memberPlaylists, enabled: loggedIn })
   const pub = useQuery({ queryKey: ['public-playlists'], queryFn: () => publicPlaylists(48) })
+  const own = mine.data?.Data ?? []
+  const ownIds = new Set(own.map((p) => p.ID))
+  // /member-playlists liefert auch die eigenen – „Mit mir geteilt“ zeigt nur fremde
+  const shared = (member.data?.Data ?? []).filter((p) => !ownIds.has(p.ID) && p.CallerRole !== 'owner')
+  const searching = !!query.trim()
+  const ownHits = filterPlaylists(own, query)
+  const sharedHits = filterPlaylists(shared, query)
+  const pubHits = filterPlaylists(pub.data?.Data ?? [], query)
+  const noHits = searching && !ownHits.length && !sharedHits.length && !pubHits.length && !mine.isLoading && !pub.isLoading
   return (
     <div className="page">
       <h1 className="page-title">{t('nav.playlists')}</h1>
-      {loggedIn && (
+      <div className="actions">
+        <input className="input search-input" placeholder={t('playlistMenu.search')} value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === 'Escape' && setQuery('')} />
+      </div>
+      {noHits && <Empty>{t('playlistMenu.noMatch')}</Empty>}
+      {loggedIn && (!searching || ownHits.length > 0) && (
         <Section title={t('playlist.mine')}>
-          {mine.isLoading ? <Spinner /> : mine.error ? <ErrorBox error={mine.error} /> : (mine.data?.Data ?? []).length ? (
-            <Grid>{mine.data!.Data!.map((p) => <PlaylistCard key={p.ID} p={p} />)}</Grid>
+          {mine.isLoading ? <Spinner /> : mine.error ? <ErrorBox error={mine.error} /> : ownHits.length ? (
+            <Grid>{ownHits.map((p) => <PlaylistCard key={p.ID} p={p} own={!p.IsFavorite} />)}</Grid>
           ) : <Empty>{t('playlist.noneOwn')}</Empty>}
         </Section>
       )}
-      {loggedIn && (member.data?.Data ?? []).length > 0 && (
+      {loggedIn && sharedHits.length > 0 && (
         <Section title={t('playlist.shared')}>
-          <Grid>{member.data!.Data!.map((p) => <PlaylistCard key={p.ID} p={p} />)}</Grid>
+          <Grid>{sharedHits.map((p) => <PlaylistCard key={p.ID} p={p} />)}</Grid>
         </Section>
       )}
-      <Section title={t('playlist.curated')}>
-        {pub.isLoading ? <Spinner /> : pub.error ? <ErrorBox error={pub.error} /> : (
-          <Grid>{(pub.data?.Data ?? []).map((p) => <PlaylistCard key={p.ID} p={p} />)}</Grid>
-        )}
-      </Section>
+      {(!searching || pubHits.length > 0) && (
+        <Section title={t('playlist.curated')}>
+          {pub.isLoading ? <Spinner /> : pub.error ? <ErrorBox error={pub.error} /> : (
+            <Grid>{pubHits.map((p) => <PlaylistCard key={p.ID} p={p} />)}</Grid>
+          )}
+        </Section>
+      )}
     </div>
   )
 }
 
 /** Umbenennen/Löschen für eigene Playlists (nicht Favoriten, geteilte oder kuratierte). */
-function OwnerActions({ p, editing, setEditing }: { p: Playlist; editing: boolean; setEditing: (v: boolean) => void }) {
+function OwnerActions({ p }: { p: Playlist }) {
   const { t } = useTranslation()
   const nav = useNavigate()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [busy, setBusy] = useState(false)
   const remove = async (): Promise<void> => {
     setBusy(true)
-    try {
-      await deletePlaylist(p.ID)
-      toast('success', t('playlist.deleted', { name: p.Name }), 2500)
-      void queryClient.invalidateQueries({ queryKey: ['my-playlists'] })
-      queryClient.removeQueries({ queryKey: ['playlist', p.ID] })
-      queryClient.removeQueries({ queryKey: ['playlist-tracks', p.ID] })
-      nav('/playlists', { replace: true })
-    } catch (e) {
-      toast('error', t('playlist.deleteFailed', { error: errorMessage(e) }))
-      setBusy(false)
-    }
+    if (await deleteOwnPlaylist(p)) nav('/playlists', { replace: true })
+    else setBusy(false)
   }
   return (
     <>
-      <button className="btn btn-secondary" disabled={editing || busy} onClick={() => setEditing(true)}>{t('playlist.rename')}</button>
       <button className="btn btn-secondary" disabled={busy} onClick={() => setConfirmDelete(true)}>{t('playlist.delete')}</button>
       {confirmDelete && (
         <div className="notice confirm">
@@ -85,20 +92,9 @@ function RenameTitle({ p, onDone }: { p: Playlist; onDone: () => void }) {
   const [name, setName] = useState(p.Name)
   const [busy, setBusy] = useState(false)
   const save = async (): Promise<void> => {
-    const n = name.trim()
-    if (!n || n === p.Name) return onDone()
     setBusy(true)
-    try {
-      await renamePlaylist(p.ID, n, p.Public)
-      queryClient.setQueryData<Playlist>(['playlist', p.ID], (old) => (old ? { ...old, Name: n } : old))
-      void queryClient.invalidateQueries({ queryKey: ['playlist', p.ID] })
-      void queryClient.invalidateQueries({ queryKey: ['my-playlists'] })
-      toast('success', t('playlist.renamed', { name: n }), 2500)
-      onDone()
-    } catch (e) {
-      toast('error', t('playlist.renameFailed', { error: errorMessage(e) }))
-      setBusy(false)
-    }
+    if (await renameOwnPlaylist(p, name)) onDone()
+    else setBusy(false)
   }
   return (
     <form className="rename-form" onSubmit={(e) => { e.preventDefault(); void save() }}>
@@ -158,7 +154,13 @@ function PlaylistView({ id, titleOverride }: { id: string; titleOverride?: strin
         <Cover src={cover ? fileCover(cover, 600) : undefined} alt={titleOverride ?? p?.Name ?? t('playlist.kind')} size={200} />
         <div className="hero-info">
           <div className="hero-kind">{t('playlist.kind')}</div>
-          {editing && own ? <RenameTitle p={p} onDone={() => setEditing(false)} /> : <h1 className="hero-title">{titleOverride ?? p?.Name ?? '…'}</h1>}
+          {editing && own ? (
+            <RenameTitle p={p} onDone={() => setEditing(false)} />
+          ) : own ? (
+            <h1 className="hero-title editable" title={t('playlist.renameHint')} role="button" tabIndex={0} onClick={() => setEditing(true)} onKeyDown={(e) => e.key === 'Enter' && setEditing(true)}>{p.Name}</h1>
+          ) : (
+            <h1 className="hero-title">{titleOverride ?? p?.Name ?? '…'}</h1>
+          )}
           <div className="hero-meta">{t('common.trackCount', { count: total, formatted: total })}{p?.FollowerCount ? ` · ${t('playlist.followers', { count: p.FollowerCount })}` : ''}</div>
         </div>
       </header>
@@ -166,7 +168,7 @@ function PlaylistView({ id, titleOverride }: { id: string; titleOverride?: strin
         <button className="play-btn big" disabled={!tracks.length} onClick={() => void playAll()} title={t('player.play')}><IconPlay /></button>
         <DownloadMenu label={t('download.playlist')} disabled={!total} onDownload={(f, force) => void downloadPlaylist(id, f, force)} />
         {downloaded > 0 && <span className="progress-pill"><IconCheck size={14} /> {t('playlist.loadedDownloaded', { count: downloaded })}</span>}
-        {own && <OwnerActions p={p} editing={editing} setEditing={setEditing} />}
+        {own && <OwnerActions p={p} />}
       </div>
       {q.isLoading ? <Spinner /> : q.error ? <ErrorBox error={q.error} /> : tracks.length ? (
         <>

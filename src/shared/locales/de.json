@@ -266,7 +266,6 @@
     "empty": "Diese Playlist ist leer.",
     "loadedDownloaded_one": "{{count}} der geladenen Tracks heruntergeladen",
     "loadedDownloaded_other": "{{count}} der geladenen Tracks heruntergeladen",
-    "rename": "Umbenennen",
     "renameSave": "Speichern",
     "renamed": "Playlist in „{{name}}“ umbenannt",
     "renameFailed": "Umbenennen fehlgeschlagen: {{error}}",
@@ -274,7 +273,12 @@
     "deleteConfirm": "Playlist „{{name}}“ löschen? Das lässt sich nicht rückgängig machen.",
     "deleteStart": "Endgültig löschen",
     "deleted": "Playlist „{{name}}“ gelöscht",
-    "deleteFailed": "Löschen fehlgeschlagen: {{error}}"
+    "deleteFailed": "Löschen fehlgeschlagen: {{error}}",
+    "playNow": "Abspielen",
+    "playTitle": "„{{title}}“ abspielen",
+    "renameEllipsis": "Umbenennen…",
+    "deleteEllipsis": "Löschen…",
+    "renameHint": "Klicken zum Umbenennen"
   },
   "similar": {
     "titleWith": "Ähnlich wie <link>„{{title}}“</link>",

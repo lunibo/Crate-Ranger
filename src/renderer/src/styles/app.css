@@ -620,3 +620,9 @@ kbd { font-family: inherit; font-size: 12px; border: 1px solid var(--line); bord
 .actions .notice.confirm { flex-basis: 100%; margin: 0; }
 .rename-form { display: flex; align-items: center; gap: 8px; margin: 4px 0 10px; flex-wrap: wrap; }
 .hero-title-input { font-size: 28px; font-weight: 800; padding: 6px 12px; flex: 1 1 280px; min-width: 0; }
+.hero-title.editable { cursor: text; border-radius: 8px; margin-left: -8px; padding: 0 8px; }
+.hero-title.editable:hover { background: var(--bg-hover); }
+.menu-text { padding: 6px 12px 8px; font-size: 13px; color: var(--text-2); max-width: 280px; white-space: normal; }
+.menu-danger { color: var(--danger); }
+.search-input { flex: 0 1 360px; }
+.card.ctx { background: var(--bg-elev-2); }

@@ -16,8 +16,10 @@ Bibliotheksverwaltung.
 - **Alles ist verlinkt**: Songtitel öffnen die Track-Seite (Metadaten, Stimmungen/Themen/Instrumente,
   Lyrics, „Erscheint auf“, ähnliche Tracks), Artist-Namen den Artist, Release-Titel und Cover das Release –
   in Listen, Karten, Player, Warteschlange, Downloads und Bibliothek.
-- **Suche**: Namenssuche (Artists, Releases, Playlists, Tracks …) und SoundScout-KI-Suche per Beschreibung;
-  „Ähnliche Tracks“ für jeden Track.
+- **Suche**: Namenssuche (Artists, Releases, Playlists, Tracks …) und SoundScout-KI-Suche per Beschreibung (Enter) –
+  direkt in der Titelleiste, von jeder Seite aus (<kbd>Strg</kbd>+<kbd>K</kbd>); „Ähnliche Tracks“ für jeden Track.
+- **Eigene Titelleiste** im Look der App mit **Zurück/Vor** (auch <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd> und
+  Maus-Seitentasten); die Fensterknöpfe bleiben die des Systems, Windows-Snap-Layouts funktionieren weiter.
 - **Player**: Warteschlange, Zufall, Wiederholen, Spulen, Lautstärke, Windows-Medientasten.
   Eingeloggt in voller Länge (MP3 320). Heruntergeladene Tracks werden lokal abgespielt.
 - **Weiterhören**: Die App merkt sich Warteschlange, Track und Position – nach dem Neustart geht es mit „Play“
@@ -26,6 +28,10 @@ Bibliotheksverwaltung.
   ähnliche Tracks weiter – ohne Versionen von Songs, die schon liefen. Beim ersten Ende fragt die App einmal nach.
 - **Playlists & Favoriten** des eigenen Kontos. Ein Herz in der Player-Leiste (laufender Song), in jeder
   Trackzeile und auf der Track-Seite fügt Songs den SoundScout-Favoriten hinzu bzw. entfernt sie.
+  Eigene Playlists lassen sich anlegen, umbenennen (Klick auf den Titel), löschen und durchsuchen; Tracks kommen
+  über „Zur Playlist hinzufügen“ hinein (mit Suche, neue Playlist direkt dort anlegbar).
+- **Rechtsklick-Menüs** auf jedem Track – auch dem laufenden in der Player-Leiste – und auf Playlist-Karten:
+  als Nächstes spielen, zur Warteschlange, zur Playlist, ähnliche Tracks, zum Release, Download u. a.
 - **Downloads** (FLAC, MP3 320, WAV) für Track, Release, Playlist, Favoriten oder die geladenen Tracks
   einer Artist-/Katalogansicht, mit Warteschlange
   (parallel, pausier- und fortsetzbar). Bei Kontingent- oder Abo-Fehlern hält die Warteschlange an.

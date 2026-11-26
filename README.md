@@ -26,8 +26,10 @@
 - **Browse** new releases, popular tracks, curated playlists, artists and the full catalog.
 - **Filter the catalog** by genre, mood, theme, instruments, release type, BPM range and “Copyright Safe”.
 - **Explore** genres, moods and themes as tiles.
-- **Search** by name (artists, releases, playlists, tracks) or describe a sound for SoundScout's **AI search**;
-  every track has **similar tracks**.
+- **Search** by name (artists, releases, playlists, tracks) or describe a sound for SoundScout's **AI search**
+  (Enter) – right in the title bar, from every page (<kbd>Ctrl</kbd>+<kbd>K</kbd>); every track has **similar tracks**.
+- **Custom title bar** in the app's look with **back / forward** (also <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd> and the
+  mouse side buttons); the window buttons stay native, so Windows Snap Layouts keep working.
 - **Player** with queue, shuffle, repeat, seeking, volume and media keys – full-length streams (MP3 320) when signed in,
   downloaded tracks play from disk, even offline.
 - **Pick up where you left off** – queue, track and position are remembered; after a restart, *Play* continues
@@ -37,6 +39,10 @@
 - **Everything is a link** – song titles open the track page, artist names the artist, release titles and covers the release.
 - **Hover play** on every cover starts the whole single, EP or album.
 - **Favorites** – heart the current song in the player bar or any track in a list.
+- **Your playlists** – create, rename (click the title) and delete them, search them, and add tracks via
+  *Add to playlist* (with search; a new playlist can be created right there).
+- **Right-click menus** on every track – including the one playing in the player bar – and on playlist cards:
+  play next, add to queue, add to playlist, similar tracks, go to release, download and more.
 
 | Release | Catalog with filters |
 |---|---|

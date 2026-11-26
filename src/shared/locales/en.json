@@ -26,7 +26,6 @@
   },
   "nav": {
     "home": "Home",
-    "search": "Search",
     "catalog": "Catalog",
     "explore": "Explore",
     "artists": "Artists",
@@ -37,7 +36,9 @@
     "downloads": "Downloads",
     "settings": "Settings",
     "accountSettings": "Account & settings",
-    "report": "Field Report"
+    "report": "Field Report",
+    "back": "Back (Alt+←)",
+    "forward": "Forward (Alt+→)"
   },
   "auth": {
     "signIn": "Sign in",
@@ -305,7 +306,8 @@
       "genre": "Genres",
       "mood": "Moods",
       "theme": "Themes"
-    }
+    },
+    "clear": "Clear search"
   },
   "browse": {
     "sort": {

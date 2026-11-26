@@ -70,6 +70,11 @@ function createWindow(): BrowserWindow {
     backgroundColor: '#0b0f17',
     icon: appIcon,
     autoHideMenuBar: true,
+    // Eigene Titelleiste im Renderer (layout/TitleBar.tsx); die Fensterknöpfe zeichnet weiter
+    // das System, nur farblich angepasst – so bleiben z. B. die Snap-Layouts von Windows erhalten.
+    // Farbe/Höhe müssen zu .titlebar und --titlebar-h in app.css passen.
+    titleBarStyle: 'hidden',
+    titleBarOverlay: { color: '#121a2a', symbolColor: '#9aa6bb', height: 40 },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       partition: PARTITION,

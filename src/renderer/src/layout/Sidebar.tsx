@@ -5,7 +5,7 @@ import { openRelease, useUpdate } from '../lib/update'
 import { useAuth, useDownloads } from '../lib/stores'
 import { QuotaMeter } from '../components/QuotaMeter'
 import {
-  IconChart, IconCompass, IconDownload, IconHeart, IconHome, IconList, IconMic, IconSearch, IconSettings, IconSparkle, IconUser
+  IconChart, IconCompass, IconDownload, IconHeart, IconHome, IconList, IconMic, IconSettings, IconSparkle, IconUser
 } from '../components/Icons'
 
 const Item = ({ to, icon, label, badge }: { to: string; icon: React.ReactNode; label: string; badge?: number }) => (
@@ -26,6 +26,8 @@ export function Sidebar() {
   const active = jobs.filter((j) => ['queued', 'preparing', 'downloading', 'tagging'].includes(j.status)).length
   return (
     <aside className="sidebar">
+      {/* Oberer Rand gehört optisch zur Titelleiste: dort lässt sich das Fenster ziehen */}
+      <div className="sidebar-drag" aria-hidden />
       <div className="brand">
         <img className="brand-icon" src={logo} alt="" width={36} height={36} />
         <div>
@@ -40,7 +42,6 @@ export function Sidebar() {
       )}
       <nav className="nav">
         <Item to="/" icon={<IconHome />} label={t('nav.home')} />
-        <Item to="/search" icon={<IconSearch />} label={t('nav.search')} />
         <Item to="/browse" icon={<IconSparkle />} label={t('nav.catalog')} />
         <Item to="/explore" icon={<IconCompass />} label={t('nav.explore')} />
         <Item to="/artists" icon={<IconMic />} label={t('nav.artists')} />

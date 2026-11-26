@@ -44,3 +44,5 @@ export const IconLibrary = (p: P) => (<svg {...base(p)}><path d="M4 4v16M9 4v16M
 export const IconQueue = (p: P) => (<svg {...base(p)}><path d="M3 6h13M3 12h13M3 18h9M17 16l4 2-4 2z" /></svg>)
 export const IconChart = (p: P) => (<svg {...base(p)}><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>)
 export const IconUser = (p: P) => (<svg {...base(p)}><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>)
+export const IconChevronLeft = (p: P) => (<svg {...base(p)}><path d="m15 18-6-6 6-6" /></svg>)
+export const IconChevronRight = (p: P) => (<svg {...base(p)}><path d="m9 18 6-6-6-6" /></svg>)

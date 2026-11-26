@@ -10,7 +10,6 @@ import { artistImage, catalog, fileCover, releaseCover, searchNames, searchPromp
 import { fmtYear } from '../lib/format'
 import { useAuth } from '../lib/stores'
 import { Cover, Empty, ErrorBox, LoadMore, Section, Spinner } from '../components/Common'
-import { IconSearch, IconSparkle } from '../components/Icons'
 import { TrackTable } from '../components/TrackTable'
 import { ArtistLinks } from '../components/ArtistLinks'
 
@@ -72,11 +71,11 @@ function AiResults({ prompt }: { prompt: string }) {
 
 export function Search() {
   const { t } = useTranslation()
-  const [params, setParams] = useSearchParams()
+  // Eingabe passiert in der Titelleiste (layout/TitleBar.tsx), die den Begriff in die URL schreibt
+  const [params] = useSearchParams()
   const nav = useNavigate()
-  const [text, setText] = useState(params.get('q') ?? '')
   const mode = params.get('mode') === 'ai' ? 'ai' : 'names'
-  const q = useDebounced(text.trim(), 300)
+  const q = useDebounced((params.get('q') ?? '').trim(), 300)
   const loggedIn = useAuth((s) => !!s.state?.loggedIn)
   const names = useQuery({
     queryKey: ['names', q],
@@ -84,9 +83,6 @@ export function Search() {
     enabled: mode === 'names' && q.length >= 2 && loggedIn,
     staleTime: 5 * 60_000
   })
-  useEffect(() => {
-    if (mode === 'names') setParams(q ? { q } : {}, { replace: true })
-  }, [q, mode, setParams])
   // Statistik: Suchbegriff zählen, wenn der Nutzer 1,5 s innehält (nicht jeden Tastendruck)
   useEffect(() => {
     if (mode !== 'names' || q.length < 2 || !loggedIn) return
@@ -94,31 +90,10 @@ export function Search() {
     return () => clearTimeout(timer)
   }, [q, mode, loggedIn])
 
-  const submitAi = (): void => {
-    if (text.trim().length < 3) return
-    window.ss.stats.event({ type: 'ai-search', ref: text.trim() })
-    nav(`/search?mode=ai&q=${encodeURIComponent(text.trim())}`)
-  }
   const groups = names.data?.NameMatches?.Groups ?? []
   const trackGroup = groups.find((g) => g.Kind === 'track')
   return (
     <div className="page">
-      <div className="search-bar">
-        <IconSearch />
-        <input
-          autoFocus
-          value={text}
-          placeholder={t('search.placeholder')}
-          onChange={(e) => {
-            setText(e.target.value)
-            if (mode === 'ai') setParams({ q: e.target.value })
-          }}
-          onKeyDown={(e) => e.key === 'Enter' && submitAi()}
-        />
-        <button className="btn btn-secondary" onClick={submitAi} disabled={text.trim().length < 3} title={t('search.aiSearchHint')}>
-          <IconSparkle /> {t('search.aiSearch')}
-        </button>
-      </div>
       {!loggedIn && <div className="notice">{t('search.signInRequired')}</div>}
       {mode === 'ai' && params.get('q') ? (
         <AiResults prompt={params.get('q')!} />

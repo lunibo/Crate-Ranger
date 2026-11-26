@@ -8,6 +8,7 @@ import { UpdatePrompt } from './components/UpdatePrompt'
 import { LoginDialog } from './components/LoginDialog'
 import { PlayerBar } from './layout/PlayerBar'
 import { Sidebar } from './layout/Sidebar'
+import { TitleBar } from './layout/TitleBar'
 import { ArtistPage, ArtistsPage } from './pages/Artist'
 import { Browse } from './pages/Browse'
 import { DownloadsPage } from './pages/Downloads'
@@ -59,6 +60,7 @@ export function App() {
   return (
     <div className="app">
       <Sidebar />
+      <TitleBar />
       <main className="main" ref={mainRef}>
         <Routes>
           <Route path="/" element={<Home />} />

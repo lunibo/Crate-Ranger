@@ -12,10 +12,9 @@
       "vite/client",
       "electron-vite/node"
     ],
-    "baseUrl": ".",
     "paths": {
       "@shared/*": [
-        "src/shared/*"
+        "./src/shared/*"
       ]
     }
   },

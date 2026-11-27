@@ -12,13 +12,12 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "baseUrl": ".",
     "paths": {
       "@shared/*": [
-        "src/shared/*"
+        "./src/shared/*"
       ],
       "@/*": [
-        "src/renderer/src/*"
+        "./src/renderer/src/*"
       ]
     },
     "resolveJsonModule": true,

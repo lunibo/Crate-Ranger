@@ -29,7 +29,7 @@ const rawKeys = () => win.evaluate(() => {
   }
   return [...found]
 })
-const routes = ['/', '/browse', '/explore', '/search?q=feint', '/artists', '/artist/shingo-nakamura', '/release/001b48d9-16d6-4790-a816-9de66a43cd80', '/track/53088d3f-f0d7-4c6a-8eed-c5eff39164ae', '/playlists', '/favorites', '/library', '/downloads', '/settings']
+const routes = ['/', '/browse', '/explore', '/search?q=feint', '/artists', '/artist/shingo-nakamura', '/release/001b48d9-16d6-4790-a816-9de66a43cd80', '/track/53088d3f-f0d7-4c6a-8eed-c5eff39164ae', '/playlists', '/favorites', '/downloads/library', '/downloads', '/settings']
 for (const lang of ['en', 'de']) {
   await go('/settings', 2000)
   await win.selectOption('.settings select.select >> nth=0', lang)

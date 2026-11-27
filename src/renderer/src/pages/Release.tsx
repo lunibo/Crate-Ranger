@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { PreReleaseBadge } from '../components/PreReleaseBadge'
 import { isPreRelease } from '@shared/release'
 import { useTranslation } from 'react-i18next'
@@ -6,10 +6,10 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { release, releaseArtists, releaseCover, releaseTracks, releases, toTrack } from '../lib/api'
 import { fmtDate, fmtDuration } from '../lib/format'
-import { downloadRelease, releaseProgress, useLibrary } from '../lib/stores'
+import { downloadRelease, releaseProgress, trackStatus, useLibrary } from '../lib/stores'
 import { usePlayer } from '../player/player'
 import { Grid, ReleaseCard } from '../components/Cards'
-import { Cover, DownloadMenu, ErrorBox, LoadMore, Section, Spinner } from '../components/Common'
+import { Cover, DownloadMenu, ErrorBox, LoadMore, QueueMenu, Section, Spinner } from '../components/Common'
 import { IconCheck, IconPlay } from '../components/Icons'
 import { TrackTable } from '../components/TrackTable'
 
@@ -27,10 +27,22 @@ export function ReleasePage() {
   })
   const snap = useLibrary((s) => s.snap)
   const tracks = useMemo(() => (tracksQ.data?.Data ?? []).map(toTrack), [tracksQ.data])
+  const trackTotal = tracksQ.data?.Total ?? tracks.length
+  // Tracks, die bereits über ein anderes Release (z.B. Single) vorhanden sind, diesem zuordnen – damit auch die Karten stimmen
+  useEffect(() => {
+    if (!tracks.length) return
+    const linked = new Set(snap.links?.[id]?.trackIds ?? [])
+    const missing = tracks
+      .filter((t) => trackStatus(snap, t.trackId) === 'downloaded' && snap.tracks[t.trackId].releaseId !== id && !linked.has(t.trackId))
+      .map((t) => t.trackId)
+    if (missing.length) void window.ss.library.linkRelease(id, missing, trackTotal)
+  }, [id, tracks, trackTotal, snap])
   if (rel.isLoading) return <div className="page"><Spinner /></div>
   if (rel.error || !rel.data) return <div className="page"><ErrorBox error={rel.error} onRetry={() => void rel.refetch()} /></div>
   const r = rel.data
-  const prog = releaseProgress(snap, r.ID, tracksQ.data?.Total)
+  const prog = tracks.length
+    ? { done: tracks.filter((t) => trackStatus(snap, t.trackId) === 'downloaded').length, total: trackTotal }
+    : releaseProgress(snap, r.ID)
   const totalDur = tracks.reduce((n, t) => n + t.duration, 0)
   return (
     <div className="page">
@@ -63,6 +75,7 @@ export function ReleasePage() {
       <div className="actions">
         <button className="play-btn big" disabled={!tracks.length} onClick={() => usePlayer.getState().playList(tracks)} title={t('player.play')}><IconPlay /></button>
         <DownloadMenu label={t('download.release')} unavailableUntil={isPreRelease(r.ReleaseDate) ? r.ReleaseDate : undefined} onDownload={(f, force) => void downloadRelease(r.ID, f, force)} />
+        <QueueMenu tracks={tracks} playNextLabel={t('release.playNext')} addLabel={t('release.addToQueue')} />
         {prog.done > 0 && (
           <span className={`progress-pill ${prog.total && prog.done >= prog.total ? 'full' : ''}`}>
             <IconCheck size={14} /> {t('status.progressDownloaded', { done: prog.done, total: prog.total || tracks.length })}

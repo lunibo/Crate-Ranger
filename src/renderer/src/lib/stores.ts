@@ -174,10 +174,7 @@ export function localFile(snap: LibrarySnapshot, trackId: string): string | null
   return f ? f.path : null
 }
 
-export function releaseProgress(snap: LibrarySnapshot, releaseId: string, total?: number): { done: number; total: number } {
-  const done = Object.values(snap.tracks).filter((t) => t.releaseId === releaseId && t.files.some((f) => !f.missing)).length
-  return { done, total: total ?? snap.releases[releaseId]?.trackTotal ?? 0 }
-}
+export { releaseProgress } from '@shared/libraryProgress'
 
 // ---------- Downloads ----------
 interface DownloadStore {

@@ -18,11 +18,14 @@ function defaults(): Settings {
     pathTemplate: DEFAULT_PATH_TEMPLATE,
     concurrency: 2,
     skipExisting: true,
+    copyToAllReleases: false,
     saveCoverFile: true,
     volume: 0.8,
     language: SYSTEM_LANGUAGE,
     discordEnabled: false,
-    statsEnabled: true
+    statsEnabled: true,
+    autoplay: null,
+    updateCheck: null
   }
 }
 
@@ -37,11 +40,14 @@ function validate(s: Settings): Settings {
       typeof s.pathTemplate === 'string' && s.pathTemplate.includes('{') ? s.pathTemplate : d.pathTemplate,
     concurrency: Math.min(4, Math.max(1, Math.round(Number(s.concurrency) || d.concurrency))),
     skipExisting: typeof s.skipExisting === 'boolean' ? s.skipExisting : d.skipExisting,
+    copyToAllReleases: typeof s.copyToAllReleases === 'boolean' ? s.copyToAllReleases : d.copyToAllReleases,
     saveCoverFile: typeof s.saveCoverFile === 'boolean' ? s.saveCoverFile : d.saveCoverFile,
     volume: Math.min(1, Math.max(0, Number(s.volume ?? d.volume))),
     language: isValidLanguageSetting(s.language) ? s.language : d.language,
     discordEnabled: typeof s.discordEnabled === 'boolean' ? s.discordEnabled : d.discordEnabled,
-    statsEnabled: typeof s.statsEnabled === 'boolean' ? s.statsEnabled : d.statsEnabled
+    statsEnabled: typeof s.statsEnabled === 'boolean' ? s.statsEnabled : d.statsEnabled,
+    autoplay: typeof s.autoplay === 'boolean' ? s.autoplay : d.autoplay,
+    updateCheck: typeof s.updateCheck === 'boolean' ? s.updateCheck : d.updateCheck
   }
 }
 

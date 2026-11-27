@@ -26,7 +26,6 @@
   },
   "nav": {
     "home": "Home",
-    "search": "Search",
     "catalog": "Catalog",
     "explore": "Explore",
     "artists": "Artists",
@@ -37,7 +36,9 @@
     "downloads": "Downloads",
     "settings": "Settings",
     "accountSettings": "Account & settings",
-    "report": "Field Report"
+    "report": "Field Report",
+    "back": "Back (Alt+←)",
+    "forward": "Forward (Alt+→)"
   },
   "auth": {
     "signIn": "Sign in",
@@ -86,10 +87,27 @@
   "trackMenu": {
     "playNext": "Play next",
     "addToQueue": "Add to queue",
+    "addToPlaylist": "Add to playlist",
     "similar": "Similar tracks",
     "details": "Track details",
     "goToRelease": "Go to release",
-    "openOnSoundScout": "Open on SoundScout"
+    "openOnSoundScout": "Open on SoundScout",
+    "back": "Back"
+  },
+  "playlistMenu": {
+    "create": "New playlist",
+    "createNamed": "Create playlist “{{name}}”",
+    "namePlaceholder": "Playlist name",
+    "createButton": "Create",
+    "loading": "Loading playlists…",
+    "empty": "No playlists of your own yet",
+    "loadFailed": "Couldn't load playlists",
+    "search": "Search playlists…",
+    "noMatch": "No matching playlist",
+    "added": "Added “{{title}}” to “{{playlist}}”",
+    "addFailed": "Couldn't add to “{{playlist}}”: {{error}}",
+    "created": "Created playlist “{{playlist}}” and added “{{title}}”",
+    "createFailed": "Couldn't create the playlist: {{error}}"
   },
   "track": {
     "kind": "Song",
@@ -151,7 +169,9 @@
     "playbackFailed": "Playback failed: {{error}}",
     "playingNext": "“{{title}}” will play next",
     "addedToQueue_one": "{{count}} track added to the queue",
-    "addedToQueue_other": "{{count}} tracks added to the queue"
+    "addedToQueue_other": "{{count}} tracks added to the queue",
+    "playingNextMany_one": "{{count}} track will play next",
+    "playingNextMany_other": "{{count}} tracks will play next"
   },
   "download": {
     "download": "Download",
@@ -170,7 +190,7 @@
     "signInRequired": "Please sign in to SoundScout to download."
   },
   "downloads": {
-    "summary": "{{open}} open · {{done}} done · {{skipped}} skipped · {{errors}} errors",
+    "summary": "{{open}} open · {{done}} done · {{copied}} copied · {{skipped}} skipped · {{errors}} errors",
     "paused": "Queue paused",
     "pausedReason": "Queue paused: {{reason}}",
     "resume": "Resume",
@@ -178,7 +198,8 @@
     "retryAt": "Server busy – next attempt at {{time}}.",
     "retryFailed": "Retry failed",
     "clearFinished": "Clear finished",
-    "empty": "No downloads. Start one with the download button on tracks, releases or playlists."
+    "empty": "No downloads. Start one with the download button on tracks, releases or playlists.",
+    "tabQueue": "Queue"
   },
   "jobStatus": {
     "queued": "Waiting",
@@ -186,6 +207,7 @@
     "downloading": "Downloading",
     "tagging": "Tags & cover",
     "done": "Done",
+    "copied": "Copied",
     "skipped": "Already present",
     "error": "Error",
     "cancelled": "Cancelled"
@@ -220,7 +242,9 @@
     "moreFrom": "More from {{artist}}",
     "goToArtist": "Go to artist",
     "play": "Play “{{title}}”",
-    "noTracks": "This release has no playable tracks."
+    "noTracks": "This release has no playable tracks.",
+    "playNext": "Play release next",
+    "addToQueue": "Add release to queue"
   },
   "preRelease": {
     "badge": "Pre-release",
@@ -242,7 +266,20 @@
     "curated": "Curated playlists",
     "empty": "This playlist is empty.",
     "loadedDownloaded_one": "{{count}} of the loaded tracks downloaded",
-    "loadedDownloaded_other": "{{count}} of the loaded tracks downloaded"
+    "loadedDownloaded_other": "{{count}} of the loaded tracks downloaded",
+    "renameSave": "Save",
+    "renamed": "Renamed playlist to “{{name}}”",
+    "renameFailed": "Couldn't rename: {{error}}",
+    "delete": "Delete",
+    "deleteConfirm": "Delete playlist “{{name}}”? This can't be undone.",
+    "deleteStart": "Delete permanently",
+    "deleted": "Deleted playlist “{{name}}”",
+    "deleteFailed": "Couldn't delete: {{error}}",
+    "playNow": "Play",
+    "playTitle": "Play “{{title}}”",
+    "renameEllipsis": "Rename…",
+    "deleteEllipsis": "Delete…",
+    "renameHint": "Click to rename"
   },
   "similar": {
     "titleWith": "Similar to <link>“{{title}}”</link>",
@@ -269,7 +306,8 @@
       "genre": "Genres",
       "mood": "Moods",
       "theme": "Themes"
-    }
+    },
+    "clear": "Clear search"
   },
   "browse": {
     "sort": {
@@ -311,7 +349,15 @@
     "missingNotice_other": "{{count}} tracks are missing from disk (moved or deleted).",
     "empty": "Nothing downloaded yet. Existing downloads can be imported with “Scan folder”.",
     "downloadMissing": "Download missing",
-    "unknownArtist": "Unknown"
+    "unknownArtist": "Unknown",
+    "refresh": "Update tags & folders",
+    "refreshHint": "Re-reads the metadata from SoundScout, rewrites the tags and moves files into the current folder structure. Downloads nothing – doesn’t count towards your quota.",
+    "refreshConfirm": "Rewrite the tags of all {{count}} downloaded files and move them into the current folder structure (“{{template}}”)? Empty old folders are removed; nothing is downloaded.",
+    "refreshStart": "Update now",
+    "refreshProgress": "Updating… {{done}}/{{total}}",
+    "refreshResult": "{{retagged}} files updated, {{moved}} moved",
+    "refreshFailed_one": "{{count}} file could not be updated: {{error}}",
+    "refreshFailed_other": "{{count}} files could not be updated, e.g. {{error}}"
   },
   "settings": {
     "folderChanged": "Download folder changed. Tip: “Scan folder” under “Downloaded” imports existing files.",
@@ -342,6 +388,8 @@
       "restoreDefault": "Restore default",
       "concurrency": "Simultaneous downloads",
       "skipExisting": "Skip tracks that are already downloaded (saves download quota)",
+      "copyToAllReleases": "Keep tracks in every release",
+      "copyToAllReleasesHint": "If a downloaded track also belongs to another release (e.g. single and album), the file is copied into that release's folder and tagged with its metadata and cover – without downloading it again. For releases you already downloaded, just download the release again.",
       "saveCover": "Save cover.jpg in the release folder"
     },
     "metadata": {
@@ -369,13 +417,30 @@
       "confirm": "Delete all listening statistics permanently?",
       "confirmYes": "Delete",
       "cleared": "Listening statistics deleted"
+    },
+    "cache": {
+      "title": "Cache",
+      "covers": "Covers",
+      "images_one": "{{formatted}} image",
+      "images_other": "{{formatted}} images",
+      "data": "Catalog data",
+      "entries_one": "{{formatted}} entry",
+      "entries_other": "{{formatted}} entries",
+      "browser": "Browser cache",
+      "total": "Total",
+      "hint": "Covers (max. 300 MB) and catalog data are cached so pages load faster. Music is not cached but streamed – downloaded tracks are not affected.",
+      "clear": "Clear cache",
+      "confirm": "Delete covers, catalog data and browser cache? Downloaded tracks are kept.",
+      "confirmYes": "Clear",
+      "cleared": "Cache cleared"
     }
   },
   "queue": {
     "restoredPaused": "Unfinished downloads from your last session – click “Resume” to continue.",
     "signInRequired": "Not signed in – please sign in, then resume.",
     "pausedManually": "Paused manually",
-    "retryIn": "{{message}} – retrying in {{seconds}} s"
+    "retryIn": "{{message}} – retrying in {{seconds}} s",
+    "pausedForRefresh": "Paused while the library is being updated"
   },
   "discord": {
     "by": "by {{artists}}",
@@ -389,7 +454,10 @@
     "incompleteDownload": "Incomplete download ({{loaded}}/{{total}} bytes)",
     "invalidSessionValue": "That doesn't look like a valid goldloginz value.",
     "sessionRejected": "SoundScout didn't accept the session (expired or copied incorrectly?).",
-    "preRelease": "Pre-release – downloads open on release day ({{date}})"
+    "preRelease": "Pre-release – downloads open on release day ({{date}})",
+    "refreshRunning": "The library is already being updated.",
+    "refreshBusy": "Downloads are running – update the library once they have finished.",
+    "targetExists": "A different file already exists at {{path}}"
   },
   "report": {
     "showChart": "Chart",
@@ -525,5 +593,45 @@
       "next": "Next"
     },
     "quoted": "“{{text}}”"
+  },
+  "autoplay": {
+    "settingsTitle": "Playback",
+    "enable": "Autoplay",
+    "hint": "When your queue, an album or a single song ends, similar tracks keep playing automatically. Requires signing in.",
+    "queueHeading": "Autoplay · similar tracks",
+    "promptTitle": "Keep listening?",
+    "promptText": "Your music has ended. With Autoplay, similar tracks keep playing automatically.",
+    "promptYes": "Turn on Autoplay",
+    "promptNo": "No, thanks",
+    "promptHint": "You can change this anytime in the settings."
+  },
+  "update": {
+    "settingsTitle": "Updates",
+    "enable": "Check for new versions on startup",
+    "hint": "Looks up the public release list on GitHub at most every 6 hours. No account or usage data is sent; like any request, GitHub sees your IP address.",
+    "installed": "Installed version",
+    "latest": "Latest version",
+    "checkNow": "Check now",
+    "checking": "Checking…",
+    "upToDate": "You have the latest version.",
+    "availableShort": "Update available: {{version}}",
+    "failed": "Check failed ({{error}})",
+    "checkedAt": "last checked {{date}}",
+    "download": "Download",
+    "later": "Later",
+    "availableTitle": "Version {{version}} is out",
+    "availableText": "You’re on {{current}}. Get the new version on GitHub.",
+    "consentTitle": "Check for updates?",
+    "consentText": "Crate Ranger can look on GitHub at startup to see whether a new version is available. It only fetches the public release list – no account or usage data.",
+    "consentYes": "Yes, check for updates",
+    "consentNo": "No",
+    "consentHint": "You can change this anytime in the settings."
+  },
+  "playQueue": {
+    "clear": "Clear",
+    "clearHint": "Remove all upcoming tracks – the current one keeps playing",
+    "remove": "Remove from queue",
+    "upNext": "Next up",
+    "empty": "No more tracks in the queue."
   }
 }

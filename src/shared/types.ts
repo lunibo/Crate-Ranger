@@ -194,6 +194,8 @@ export interface Settings {
   pathTemplate: string
   concurrency: number
   skipExisting: boolean
+  /** Ist ein Track schon über ein anderes Release vorhanden, Datei in den Release-Ordner kopieren und neu taggen */
+  copyToAllReleases: boolean
   saveCoverFile: boolean
   volume: number
   /** „system“ oder Sprachcode (z.B. „de“, „en“) */
@@ -202,9 +204,30 @@ export interface Settings {
   discordEnabled: boolean
   /** Hörstatistiken lokal sammeln (für Field Report) */
   statsEnabled: boolean
+  /** Endlos hören: am Ende der Warteschlange ähnliche Tracks weiterspielen. null = noch nie entschieden (→ einmalige Nachfrage) */
+  autoplay: boolean | null
+  /** Beim Start auf GitHub nach neuen Versionen suchen. null = noch nie gefragt (→ Nachfrage beim ersten Start) */
+  updateCheck: boolean | null
+}
+
+export interface UpdateState {
+  status: 'idle' | 'checking' | 'current' | 'available' | 'error'
+  currentVersion: string
+  latestVersion?: string
+  /** Release-Seite auf GitHub */
+  url?: string
+  checkedAt?: number
+  error?: string
 }
 
 // ---------- Hörstatistiken (lokal) ----------
+
+/** Artist mit SoundScout-ID und URI (für Links/Bilder). */
+export interface ArtistRef {
+  id: string
+  name: string
+  uri: string
+}
 
 /** Eine Wiedergabe – kompakt gespeichert (eine JSON-Zeile pro Wiedergabe). */
 export interface PlayRecord {
@@ -220,7 +243,7 @@ export interface PlayRecord {
   ti: string
   v: string
   a: string
-  ar: { id: string; name: string; uri: string }[]
+  ar: ArtistRef[]
   al: string
   g: string[]
   tg: string[]
@@ -282,7 +305,7 @@ export const DEFAULT_PATH_TEMPLATE =
 
 // ---------- Downloads ----------
 
-export type JobStatus = 'queued' | 'preparing' | 'downloading' | 'tagging' | 'done' | 'skipped' | 'error' | 'cancelled'
+export type JobStatus = 'queued' | 'preparing' | 'downloading' | 'tagging' | 'done' | 'copied' | 'skipped' | 'error' | 'cancelled'
 
 export interface DownloadJob {
   id: string
@@ -353,6 +376,10 @@ export interface LibraryFile {
   size: number
   downloadedAt: number
   missing?: boolean
+  /** Release, für das die Datei abgelegt und getaggt ist (ein Track kann mehreren Releases angehören). */
+  releaseId?: string
+  /** Tracknummer innerhalb dieses Releases */
+  trackNumber?: number
 }
 
 export interface LibraryTrack {
@@ -360,6 +387,8 @@ export interface LibraryTrack {
   releaseId: string
   title: string
   artist: string
+  /** Einzelne Artists mit IDs (fehlt bei älteren Einträgen und Dateien ohne SOUNDSCOUT_ARTIST_ID) */
+  artists?: ArtistRef[]
   releaseTitle: string
   releaseArtist: string
   trackNumber: number
@@ -377,9 +406,30 @@ export interface LibraryRelease {
   coverFileId?: string
 }
 
+/** Tracks, die unter einem anderen Release gespeichert sind, aber auch zu diesem gehören (z.B. Single + Album). */
+export interface LibraryReleaseLink {
+  trackIds: string[]
+  trackTotal: number
+}
+
 export interface LibrarySnapshot {
   tracks: Record<string, LibraryTrack>
   releases: Record<string, LibraryRelease>
+  links?: Record<string, LibraryReleaseLink>
+}
+
+export interface LibraryRefreshProgress {
+  done: number
+  total: number
+  current?: string
+}
+
+export interface LibraryRefreshResult {
+  total: number
+  retagged: number
+  moved: number
+  failed: number
+  errors: { path: string; error: string }[]
 }
 
 export interface ScanResult {
@@ -391,6 +441,14 @@ export interface ScanResult {
 // ---------- IPC-API für den Renderer (window.ss) ----------
 
 export type ApiParams = Record<string, string | number | boolean | (string | number)[] | undefined | null>
+
+/** Größe der Zwischenspeicher (Einstellungen → Cache) */
+export interface CacheInfo {
+  coverBytes: number
+  coverCount: number
+  /** Chromium-HTTP-Cache der Sitzung (Skripte, alte Bildantworten, Stream-Puffer) */
+  httpBytes: number
+}
 
 export interface SsBridge {
   api: {
@@ -422,12 +480,23 @@ export interface SsBridge {
     quota(): Promise<QuotaInfo>
     onQuota(cb: (q: QuotaInfo) => void): () => void
   }
+  cache: {
+    info(): Promise<CacheInfo>
+    /** Cover-Cache und Chromium-HTTP-Cache leeren (heruntergeladene Tracks bleiben) */
+    clear(): Promise<void>
+  }
   stats: {
     /** laufende Wiedergabe melden (final = abgeschlossen) */
     play(record: PlayRecord, final: boolean): void
     event(e: Omit<StatEvent, 'at'>): void
     get(): Promise<StatsData>
     clear(): Promise<void>
+  }
+  update: {
+    state(): Promise<UpdateState>
+    /** sofort prüfen (auch ohne Zustimmung beim Start – nur auf ausdrücklichen Klick) */
+    check(): Promise<UpdateState>
+    onState(cb: (s: UpdateState) => void): () => void
   }
   presence: {
     update(track: PresenceTrack | null): void
@@ -439,6 +508,11 @@ export interface SsBridge {
     verify(): Promise<ScanResult>
     scan(): Promise<ScanResult>
     remove(trackId: string, deleteFiles: boolean): Promise<void>
+    /** Bereits vorhandene Tracks zusätzlich diesem Release zuordnen (für den Fortschritt). */
+    linkRelease(releaseId: string, trackIds: string[], trackTotal: number): Promise<void>
+    /** Tags neu schreiben und Dateien nach aktuellem Ordner-Template einsortieren (kein Download). */
+    refresh(): Promise<LibraryRefreshResult>
+    onRefreshProgress(cb: (p: LibraryRefreshProgress) => void): () => void
     onUpdate(cb: (s: LibrarySnapshot) => void): () => void
   }
   settings: {

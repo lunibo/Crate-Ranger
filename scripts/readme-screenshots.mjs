@@ -91,7 +91,8 @@ async function shot(name, { scrollTo = 0 } = {}) {
 }
 
 // Englisch, Discord-Status an
-await win.evaluate(() => window.ss.settings.set({ language: 'en', discordEnabled: true }))
+// Keine Update-Nachfrage im Bild (und keine Anfrage an GitHub); „Endlos hören“ sichtbar eingeschaltet
+await win.evaluate(() => window.ss.settings.set({ language: 'en', discordEnabled: true, updateCheck: false, autoplay: true }))
 await go('/settings', 800)
 await win.selectOption('.settings select.select >> nth=0', 'en')
 await win.waitForTimeout(500)

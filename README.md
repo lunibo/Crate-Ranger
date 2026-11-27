@@ -26,13 +26,23 @@
 - **Browse** new releases, popular tracks, curated playlists, artists and the full catalog.
 - **Filter the catalog** by genre, mood, theme, instruments, release type, BPM range and “Copyright Safe”.
 - **Explore** genres, moods and themes as tiles.
-- **Search** by name (artists, releases, playlists, tracks) or describe a sound for SoundScout's **AI search**;
-  every track has **similar tracks**.
+- **Search** by name (artists, releases, playlists, tracks) or describe a sound for SoundScout's **AI search**
+  (Enter) – right in the title bar, from every page (<kbd>Ctrl</kbd>+<kbd>K</kbd>); every track has **similar tracks**.
+- **Custom title bar** in the app's look with **back / forward** (also <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd> and the
+  mouse side buttons); the window buttons stay native, so Windows Snap Layouts keep working.
 - **Player** with queue, shuffle, repeat, seeking, volume and media keys – full-length streams (MP3 320) when signed in,
   downloaded tracks play from disk, even offline.
+- **Pick up where you left off** – queue, track and position are remembered; after a restart, *Play* continues
+  right there.
+- **Autoplay** (Settings → Playback) – when the queue, an album or a single song ends, similar tracks keep playing
+  (skipping other versions of songs you just heard). The first time your music ends, the app asks once.
 - **Everything is a link** – song titles open the track page, artist names the artist, release titles and covers the release.
 - **Hover play** on every cover starts the whole single, EP or album.
 - **Favorites** – heart the current song in the player bar or any track in a list.
+- **Your playlists** – create, rename (click the title) and delete them, search them, and add tracks via
+  *Add to playlist* (with search; a new playlist can be created right there).
+- **Right-click menus** on every track – including the one playing in the player bar – and on playlist cards:
+  play next, add to queue, add to playlist, similar tracks, go to release, download and more.
 
 | Release | Catalog with filters |
 |---|---|
@@ -48,7 +58,9 @@
   ISRC, UPC, catalog number, label, brand (Uncaged/Instinct/Silk), copyright, moods, themes, instruments, lyrics,
   explicit flag, Copyright Safe status, cover and SoundScout IDs. SoundScout's non-standard ID3 header is removed
   from FLAC files – the audio stays bit-identical.
-- **Tidy folder layout** (customizable template) plus a `cover.jpg` per release:
+- **Tidy folder layout** (customizable template) plus a `cover.jpg` per release. Featured artists stay out of the
+  folder name (“Stonebank feat. EMEL” → `Stonebank/`) so all of an artist's releases sit together; the album-artist tag
+  keeps the full name:
   ```
   <download folder>/
   └─ Shingo Nakamura/
@@ -57,6 +69,8 @@
         ├─ 02 - Focus (Extended Mix).flac
         └─ cover.jpg
   ```
+- **Update tags & folders** rewrites the tags of all downloads and moves them into the current folder layout –
+  no re-download, so it doesn't touch your quota.
 - **Library** – remembers every download (✓ in all lists, x/y progress per release), detects moved or deleted files,
   re-imports existing downloads via “Scan folder” and offers “Download missing”.
 - **Download quota meter** – “x / 3,000” for the current billing period with reset date and a warning when the queue
@@ -88,7 +102,7 @@ the same computer (Windows named pipe, Linux socket incl. Flatpak/Snap).
 English and German, following your system language or a fixed choice. Adding a language is just adding a JSON file
 (see [Adding a language](#adding-a-language)).
 
-![Settings – language, Discord status and listening statistics](docs/screenshots/settings.png)
+![Settings – language, Autoplay, Discord status and listening statistics](docs/screenshots/settings.png)
 
 ## Download
 
@@ -102,6 +116,11 @@ Get the latest version from the **Releases** page of this repository:
 
 The Windows builds are not code-signed, so SmartScreen asks on first start (“More info” → “Run anyway”).
 
+**Update check:** on first start the app asks whether it may look for new versions. If you agree, it fetches the
+public release list of this repository from the GitHub API at most every 6 hours (no account or usage data; GitHub
+sees your IP address as with any request) and points you to the new release – downloading stays up to you.
+It can be switched off in *Settings → Updates*. Forks: set `UPDATE_REPO` in `src/shared/update.ts`.
+
 ## Signing in
 
 **Sign in** opens the official SoundScout sign-in page in an app window (captcha and 2FA work as usual). The app never
@@ -110,15 +129,6 @@ stores your password, only the session (valid for 30 days). If the captcha check
 
 Without signing in you can browse the catalog and listen to 30-second previews; full streams, search, playlists,
 favorites and downloads need an account (downloads a paid plan).
-
-## Discord setup
-
-Rich Presence needs a Discord application – its name is shown as “Listening to <name>”. Crate Ranger ships with a
-built-in application, so users only need the switch in the settings.
-
-If you fork the project and want your own application: create a **New Application** in the
-[Discord Developer Portal](https://discord.com/developers/applications) (e.g. named **SoundScout**), copy its
-**Application ID** and set it as `DEFAULT_DISCORD_CLIENT_ID` in `src/shared/discord.ts`. The ID is public, not a secret.
 
 ## Adding a language
 

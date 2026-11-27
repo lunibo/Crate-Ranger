@@ -37,7 +37,8 @@ export function templateValues(m: TrackMeta, ext: string): Record<string, string
   const sameArtist = m.artistsTitle.toLowerCase() === m.releaseArtist.toLowerCase()
   const titleV = withVersion(m.title, m.version)
   return {
-    releaseArtist: m.releaseArtist || m.artistsTitle || 'Unknown Artist',
+    releaseArtist: m.folderArtist || m.releaseArtist || m.artistsTitle || 'Unknown Artist',
+    releaseArtistFull: m.releaseArtist || m.artistsTitle || 'Unknown Artist',
     trackArtist: m.artistsTitle,
     year: m.year || '0000',
     releaseTitle: withVersion(m.releaseTitle || m.title, m.releaseVersion),

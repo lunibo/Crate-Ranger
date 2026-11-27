@@ -51,12 +51,16 @@ export class MetadataService {
   }
 
   async trackMeta(trackId: string, releaseId: string): Promise<{ meta: TrackMeta; row: CatalogTrack }> {
-    const res = await this.api.get<ListResponse<CatalogTrack>>('/catalog', {
-      track_id: trackId,
-      limit: 50,
-      columns: TRACK_FULL_COLUMNS
-    })
-    const rows = res.Data ?? []
+    // `track_id` allein liefert nur eine Release-Zeile (z.B. die Single) – mit `release_id` die des gewünschten Releases
+    const query = (withRelease: boolean): Promise<ListResponse<CatalogTrack>> =>
+      this.api.get<ListResponse<CatalogTrack>>('/catalog', {
+        track_id: trackId,
+        ...(withRelease ? { release_id: releaseId } : {}),
+        limit: 50,
+        columns: TRACK_FULL_COLUMNS
+      })
+    let rows = releaseId ? ((await query(true)).Data ?? []) : []
+    if (!rows.length) rows = (await query(false)).Data ?? []
     const row = rows.find((r) => r.ReleaseID === releaseId) ?? rows[0]
     if (!row) throw new Error(t('errors.trackNotInCatalog'))
     const [trackTotal, releaseArtists, tagCategories] = await Promise.all([

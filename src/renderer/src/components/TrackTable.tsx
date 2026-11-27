@@ -1,15 +1,16 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { PreReleaseBadge } from './PreReleaseBadge'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { artistsForTracks, releaseCover, type TrackLite } from '../lib/api'
-import { fmtDateTime, fmtDuration } from '../lib/format'
-import { downloadTracks, localFile, queuedTrackIds, trackStatus, useAuth, useDownloads, useFavorites, useLibrary, type DlStatus } from '../lib/stores'
+import { fmtDuration } from '../lib/format'
+import { downloadTracks, queuedTrackIds, trackStatus, useAuth, useDownloads, useFavorites, useLibrary, type DlStatus } from '../lib/stores'
 import { usePlayer } from '../player/player'
 import { Cover } from './Common'
 import { ArtistLinks, TrackLink } from './ArtistLinks'
 import { IconAlert, IconCheck, IconDownload, IconHeart, IconMore, IconPause, IconPlay, IconShield } from './Icons'
+import { TrackMenu, type MenuPos } from './TrackMenu'
 
 export function Artists({ track }: { track: TrackLite }) {
   return <ArtistLinks artists={track.artists} text={track.artistsTitle} trackId={track.trackId} releaseId={track.releaseId} />
@@ -21,54 +22,6 @@ export function StatusIcon({ status, queued }: { status: DlStatus; queued: boole
   if (status === 'downloaded') return <span className="status ok" title={t('status.downloaded')}><IconCheck size={15} /></span>
   if (status === 'missing') return <span className="status warn" title={t('status.missing')}><IconAlert size={15} /></span>
   return <span className="status none" />
-}
-
-function RowMenu({ track, onClose }: { track: TrackLite; onClose: () => void }) {
-  const { t } = useTranslation()
-  const ref = useRef<HTMLDivElement>(null)
-  const nav = useNavigate()
-  const player = usePlayer()
-  const snap = useLibrary((s) => s.snap)
-  const local = localFile(snap, track.trackId)
-  useEffect(() => {
-    const close = (e: MouseEvent): void => {
-      if (!ref.current?.contains(e.target as Node)) onClose()
-    }
-    window.addEventListener('mousedown', close)
-    return () => window.removeEventListener('mousedown', close)
-  }, [onClose])
-  const act = (fn: () => void) => () => {
-    fn()
-    onClose()
-  }
-  return (
-    <div className="menu row-menu" ref={ref} onClick={(e) => e.stopPropagation()}>
-      <button className="menu-item" onClick={act(() => player.playNext(track))}>{t('trackMenu.playNext')}</button>
-      <button className="menu-item" onClick={act(() => player.addToQueue([track]))}>{t('trackMenu.addToQueue')}</button>
-      <button className="menu-item" onClick={act(() => nav(`/similar/${track.trackId}`))}>{t('trackMenu.similar')}</button>
-      <button className="menu-item" onClick={act(() => nav(`/track/${track.trackId}`))}>{t('trackMenu.details')}</button>
-      <button className="menu-item" onClick={act(() => nav(`/release/${track.releaseId}`))}>{t('trackMenu.goToRelease')}</button>
-      <div className="menu-sep" />
-      {track.preRelease ? (
-        <div className="menu-item disabled">{t('preRelease.availableFrom', { date: fmtDateTime(track.releaseDate) })}</div>
-      ) : (
-        <>
-          <button className="menu-item" onClick={act(() => void downloadTracks([track], 'FLAC'))}>{t('download.asFormat', { format: 'FLAC' })}</button>
-          <button className="menu-item" onClick={act(() => void downloadTracks([track], 'MP3_320'))}>{t('download.asFormat', { format: 'MP3 320' })}</button>
-          <button className="menu-item" onClick={act(() => void downloadTracks([track], 'WAV'))}>{t('download.asFormat', { format: 'WAV' })}</button>
-        </>
-      )}
-      {local && (
-        <>
-          <button className="menu-item" onClick={act(() => void downloadTracks([track], undefined, true))}>{t('download.redownload')}</button>
-          <button className="menu-item" onClick={act(() => void window.ss.shell.showItem(local))}>{t('common.showInExplorer')}</button>
-        </>
-      )}
-      <button className="menu-item" onClick={act(() => void window.ss.shell.openExternal(`https://www.soundscout.com/player/music/${track.trackId}`))}>
-        {t('trackMenu.openOnSoundScout')}
-      </button>
-    </div>
-  )
 }
 
 const Row = memo(function Row({
@@ -86,7 +39,9 @@ const Row = memo(function Row({
   onPlay: (i: number) => void
 }) {
   const { t } = useTranslation()
-  const [menu, setMenu] = useState(false)
+  // null = zu, 'button' = am ⋯-Button, sonst Kontextmenü an Mausposition
+  const [menu, setMenu] = useState<null | 'button' | MenuPos>(null)
+  const closeMenu = useCallback(() => setMenu(null), [])
   const loggedIn = useAuth((s) => !!s.state?.loggedIn)
   const fav = useFavorites((s) => s.ids.has(track.trackId))
   const toggleFav = (e: React.MouseEvent): void => {
@@ -94,7 +49,15 @@ const Row = memo(function Row({
     void useFavorites.getState().toggle(track)
   }
   return (
-    <div className={`tr ${active ? 'active' : ''}`} onDoubleClick={() => onPlay(index)} role="row">
+    <div
+      className={`tr ${active ? 'active' : ''} ${menu && menu !== 'button' ? 'ctx' : ''}`}
+      onDoubleClick={() => onPlay(index)}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        setMenu({ x: e.clientX, y: e.clientY })
+      }}
+      role="row"
+    >
       <div className="td num">
         <span className="n">{active && playing ? <span className="eq"><i /><i /><i /></span> : number}</span>
         <button className="play-on-hover icon-btn" onClick={() => (active ? usePlayer.getState().toggle() : onPlay(index))} aria-label={t('player.play')}>
@@ -141,10 +104,15 @@ const Row = memo(function Row({
             <IconDownload size={15} />
           </button>
         )}
-        <button className="icon-btn" onClick={(e) => { e.stopPropagation(); setMenu((m) => !m) }} aria-label={t('common.more')}>
+        <button
+          className="icon-btn"
+          onMouseDown={(e) => menu === 'button' && e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); setMenu((m) => (m === 'button' ? null : 'button')) }}
+          aria-label={t('common.more')}
+        >
           <IconMore size={16} />
         </button>
-        {menu && <RowMenu track={track} onClose={() => setMenu(false)} />}
+        {menu && <TrackMenu track={track} at={menu === 'button' ? undefined : menu} onClose={closeMenu} />}
       </div>
     </div>
   )

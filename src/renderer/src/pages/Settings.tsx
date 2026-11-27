@@ -9,8 +9,10 @@ import { Section, Spinner } from '../components/Common'
 import { QuotaMeter } from '../components/QuotaMeter'
 import { DiscordSection } from '../components/DiscordSection'
 import { StatsSection } from '../components/StatsSection'
+import { CacheSection } from '../components/CacheSection'
+import { UpdateSection } from '../components/UpdateSection'
 
-const PLACEHOLDERS = ['releaseArtist', 'year', 'releaseTitle', 'catalogId', 'trackNo', 'trackTitle', 'title', 'version', 'trackArtist', 'brand', 'releaseType', 'label']
+const PLACEHOLDERS = ['releaseArtist', 'releaseArtistFull', 'year', 'releaseTitle', 'catalogId', 'trackNo', 'trackTitle', 'title', 'version', 'trackArtist', 'brand', 'releaseType', 'label']
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation()
@@ -54,9 +56,23 @@ export function SettingsPage() {
         </div>
       </Section>
 
+      <Section title={t('autoplay.settingsTitle')}>
+        <div className="card-box">
+          <label className="check">
+            <input type="checkbox" checked={settings.autoplay === true} onChange={(e) => void update({ autoplay: e.target.checked })} />
+            {t('autoplay.enable')}
+          </label>
+          <div className="hint">{t('autoplay.hint')}</div>
+        </div>
+      </Section>
+
       <DiscordSection />
 
       <StatsSection />
+
+      <CacheSection />
+
+      <UpdateSection />
 
       <Section title={t('settings.account.title')}>
         <div className="card-box">
@@ -125,6 +141,13 @@ export function SettingsPage() {
           <label className="check">
             <input type="checkbox" checked={settings.skipExisting} onChange={(e) => void update({ skipExisting: e.target.checked })} />
             {t('settings.downloads.skipExisting')}
+          </label>
+          <label className="check multi">
+            <input type="checkbox" checked={settings.copyToAllReleases} disabled={!settings.skipExisting} onChange={(e) => void update({ copyToAllReleases: e.target.checked })} />
+            <span>
+              {t('settings.downloads.copyToAllReleases')}
+              <span className="hint">{t('settings.downloads.copyToAllReleasesHint')}</span>
+            </span>
           </label>
           <label className="check">
             <input type="checkbox" checked={settings.saveCoverFile} onChange={(e) => void update({ saveCoverFile: e.target.checked })} />

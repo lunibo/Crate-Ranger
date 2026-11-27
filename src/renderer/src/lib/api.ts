@@ -54,6 +54,8 @@ export interface TrackLite {
   trackNumber: number
   /** Release-Zeitpunkt liegt in der Zukunft → noch nicht herunterladbar */
   preRelease: boolean
+  /** von „Endlos hören“ angehängt */
+  autoplay?: boolean
 }
 
 export function toTrack(t: CatalogTrack): TrackLite {
@@ -83,10 +85,15 @@ export function toTrack(t: CatalogTrack): TrackLite {
 }
 
 // ---------- Bilder ----------
-export const releaseCover = (releaseId: string, width = 300, fileId?: string): string =>
-  `${API}/release/${releaseId}/cover?width=${width}${fileId ? `&fileID=${fileId}` : ''}`
-export const fileCover = (fileId: string, width = 300): string => `${API}/file/${fileId}/cover?width=${width}`
-export const artistImage = (artistId: string, width = 300): string => `${API}/artist/${artistId}/cover?width=${width}`
+// Bilder laufen über den Cover-Cache des Hauptprozesses (cover://img/… → Festplatte, sonst API)
+const COVERS = 'cover://img'
+const coverPath = (kind: 'release' | 'file' | 'artist', id: string, width: number, fileId?: string): string =>
+  `/${kind}/${encodeURIComponent(id)}/cover?width=${Math.round(width)}${fileId ? `&fileID=${encodeURIComponent(fileId)}` : ''}`
+export const releaseCover = (releaseId: string, width = 300, fileId?: string): string => COVERS + coverPath('release', releaseId, width, fileId)
+export const fileCover = (fileId: string, width = 300): string => COVERS + coverPath('file', fileId, width)
+export const artistImage = (artistId: string, width = 300): string => COVERS + coverPath('artist', artistId, width)
+/** Öffentliche https-Adresse – für Stellen außerhalb der App (Discord, Medien-Steuerung des Systems) */
+export const releaseCoverRemote = (releaseId: string, width = 300): string => API + coverPath('release', releaseId, width)
 
 // ---------- Katalog ----------
 export interface CatalogFilter {
@@ -175,6 +182,15 @@ export const playlist = (id: string): Promise<Playlist> => get(`/playlist/${id}`
 export const playlistTracks = (id: string, offset = 0, limit = 50): Promise<ListResponse<PlaylistItem>> =>
   get(`/playlist/${id}/tracks`, { sort: 'Sort', offset, limit })
 export const favoritesPlaylist = (): Promise<Playlist> => get('/me/library')
+/** Neue Playlist anlegen (wie im SoundScout-Web-Player standardmäßig privat) → ID */
+export const createPlaylist = async (name: string, isPublic = false): Promise<string> =>
+  (await post<{ ID: string }>('/playlist', { Name: name, Public: isPublic })).ID
+export const addToPlaylist = (playlistId: string, trackId: string): Promise<unknown> =>
+  post(`/playlist/${playlistId}/track`, { TrackID: trackId })
+/** Umbenennen – `Public` wird mitgeschickt, damit die Sichtbarkeit unverändert bleibt */
+export const renamePlaylist = (id: string, name: string, isPublic: boolean): Promise<unknown> =>
+  post(`/playlist/${id}`, { Name: name, Public: isPublic })
+export const deletePlaylist = (id: string): Promise<unknown> => post(`/playlist/${id}/delete`)
 export const setFavorite = (trackId: string, fav: boolean): Promise<unknown> =>
   post(`/me/library/track/${trackId}${fav ? '' : '/delete'}`)
 

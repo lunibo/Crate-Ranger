@@ -106,4 +106,25 @@ describe('LibraryStore', () => {
     const reloaded = new LibraryStore(join(dir, 'lib.json'))
     expect(Object.keys(reloaded.snapshot().tracks)).toEqual(['t1', 't2'])
   })
+  it('keeps the same track for different releases but never runs it twice at once', async () => {
+    const order: string[] = []
+    let active = 0
+    let maxSameTrack = 0
+    const worker: Worker = async (job) => {
+      active += job.trackId === 't1' ? 1 : 0
+      maxSameTrack = Math.max(maxSameTrack, active)
+      order.push(`${job.trackId}@${job.releaseId}`)
+      await sleep(15)
+      active -= job.trackId === 't1' ? 1 : 0
+      return { status: 'done', path: '' }
+    }
+    const q = new DownloadQueue({ stateFile: join(tmp(), 'q.json'), worker, concurrency: () => 3 })
+    const single = track(1)
+    const album = { ...track(1), releaseId: 'album' }
+    expect(q.enqueue([single, album, track(2)], 'FLAC')).toBe(3)
+    expect(q.enqueue([album], 'FLAC')).toBe(0) // Duplikat
+    await waitFor(() => q.state().jobs.every((j) => j.status === 'done'))
+    expect(maxSameTrack).toBe(1)
+    expect(order).toEqual(['t1@r1', 't2@r1', 't1@album'])
+  })
 })

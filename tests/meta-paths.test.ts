@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import focus from './fixtures/catalog-focus.json'
 import type { CatalogTrack } from '@shared/types'
 import { DEFAULT_PATH_TEMPLATE } from '@shared/types'
-import { buildTrackMeta, localReleaseDate, parseKey, withVersion } from '../src/main/downloads/meta'
+import { buildTrackMeta, localReleaseDate, mainArtist, normalizeLyrics, orderGenres, parseKey, withVersion } from '../src/main/downloads/meta'
 import { buildTrackPath, sanitizeSegment } from '../src/main/downloads/paths'
 
 const cats = { calm: 'moods', dreamy: 'moods', beach: 'usages', summer: 'usages', synth: 'instruments', drums: 'instruments' }
@@ -25,7 +25,7 @@ describe('meta', () => {
     expect(m.title).toBe('Focus')
     expect(m.releaseArtist).toBe('Shingo Nakamura')
     expect(m.artists).toEqual(['Shingo Nakamura'])
-    expect(m.genres).toEqual(['Dance', 'Melodic House & Techno'])
+    expect(m.genres).toEqual(['Melodic House & Techno', 'Dance'])
     expect(m.year).toBe('2022')
     expect(m.releaseDate).toBe('2022-04-20')
     expect(m.key).toBe('Am')
@@ -39,6 +39,26 @@ describe('meta', () => {
     expect(m.otherTags).not.toContain('A minor')
     expect(m.trackTotal).toBe(2)
     expect(m.bpm).toBe(118)
+  })
+  it('puts the specific genre before the umbrella genre', () => {
+    expect(orderGenres(['Dance', 'Dubstep'])).toEqual(['Dubstep', 'Dance'])
+    expect(orderGenres(['Dance', 'Electronic'])).toEqual(['Electronic', 'Dance'])
+    expect(orderGenres(['Dance'])).toEqual(['Dance'])
+    expect(orderGenres(['House', 'Dance', 'House'])).toEqual(['House', 'Dance'])
+  })
+  it('removes featured artists for the folder artist', () => {
+    const roles = (list: [string, string][]) => list.map(([DisplayName, Role], i) => ({ ReleaseID: 'r', ArtistID: String(i), DisplayName, Role, ArtistNumber: i + 1 }))
+    expect(mainArtist('Stonebank feat. EMEL')).toBe('Stonebank')
+    expect(mainArtist('Darren Styles & Stonebank feat. EMEL')).toBe('Darren Styles & Stonebank')
+    expect(mainArtist('xander. ft. WHIPPED CREAM & Ehiorobo')).toBe('xander.')
+    expect(mainArtist('Botnek & I See MONSTAS')).toBe('Botnek & I See MONSTAS')
+    // Anzeigename-Reihenfolge bleibt, auch wenn die Rollenliste anders sortiert ist
+    expect(mainArtist('WHIPPED CREAM & No/Me', roles([['No/Me', 'Primary'], ['WHIPPED CREAM', 'Primary']]))).toBe('WHIPPED CREAM & No/Me')
+    // Featured ohne „feat.“ im Namen → nur Hauptartists
+    expect(mainArtist('Stonebank & EMEL', roles([['Stonebank', 'Primary'], ['EMEL', 'Featured']]))).toBe('Stonebank')
+  })
+  it('normalizes lyrics line breaks', () => {
+    expect(normalizeLyrics('a\r\nb  \r\n\rc\n')).toBe('a\nb\n\nc')
   })
   it('appends versions once', () => {
     expect(withVersion('Focus', 'Extended Mix')).toBe('Focus (Extended Mix)')
@@ -54,8 +74,13 @@ describe('paths', () => {
       join('/music', 'Shingo Nakamura', '2022 - Focus [MCS1380]', '01 - Focus.flac')
     )
   })
+  it('files featured releases under the main artist, keeps the full name available', () => {
+    const m = { ...base, releaseArtist: 'Stonebank feat. EMEL', folderArtist: 'Stonebank', artistsTitle: 'Stonebank feat. EMEL', title: 'Stronger', releaseTitle: 'Stronger', catalogId: 'MCS300', year: '2015' }
+    expect(buildTrackPath('/music', DEFAULT_PATH_TEMPLATE, m, 'flac')).toBe(join('/music', 'Stonebank', '2015 - Stronger [MCS300]', '01 - Stronger.flac'))
+    expect(buildTrackPath('/music', '{releaseArtistFull}/{trackNo} - {title}', m, 'flac')).toBe(join('/music', 'Stonebank feat. EMEL', '01 - Stronger.flac'))
+  })
   it('adds the track artist on compilations and versions', () => {
-    const m = { ...base, artistsTitle: 'Feint', version: 'VIP', releaseArtist: 'Various Artists', releaseTitle: 'Best of 2022', catalogId: '' , trackNumber: 12 }
+    const m = { ...base, artistsTitle: 'Feint', version: 'VIP', releaseArtist: 'Various Artists', folderArtist: 'Various Artists', releaseTitle: 'Best of 2022', catalogId: '' , trackNumber: 12 }
     expect(buildTrackPath('/music', DEFAULT_PATH_TEMPLATE, m, 'mp3')).toBe(
       join('/music', 'Various Artists', '2022 - Best of 2022', '12 - Feint - Focus (VIP).mp3')
     )
@@ -67,7 +92,7 @@ describe('paths', () => {
     expect(sanitizeSegment('a'.repeat(300)).length).toBe(120)
   })
   it('keeps total path length below 240', () => {
-    const m = { ...base, title: 'x'.repeat(200), releaseTitle: 'y'.repeat(110), releaseArtist: 'z'.repeat(110) }
+    const m = { ...base, title: 'x'.repeat(200), releaseTitle: 'y'.repeat(110), releaseArtist: 'z'.repeat(110), folderArtist: 'z'.repeat(110) }
     expect(buildTrackPath('C:/Users/someone/Music/SoundScout', DEFAULT_PATH_TEMPLATE, m, 'flac').length).toBeLessThanOrEqual(240)
   })
 })

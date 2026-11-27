@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { LibrarySnapshot, PresenceStatus, QueueState, QuotaInfo, SsBridge } from '@shared/types'
+import type { LibraryRefreshProgress, LibrarySnapshot, PresenceStatus, UpdateState, QueueState, QuotaInfo, SsBridge } from '@shared/types'
 
 const on = <T>(channel: string, cb: (payload: T) => void): (() => void) => {
   const listener = (_e: unknown, payload: T): void => cb(payload)
@@ -37,11 +37,20 @@ const bridge: SsBridge = {
     quota: () => ipcRenderer.invoke('downloads:quota'),
     onQuota: (cb) => on<QuotaInfo>('downloads:quota', cb)
   },
+  cache: {
+    info: () => ipcRenderer.invoke('cache:info'),
+    clear: () => ipcRenderer.invoke('cache:clear')
+  },
   stats: {
     play: (record, final) => ipcRenderer.send('stats:play', record, final),
     event: (e) => ipcRenderer.send('stats:event', e),
     get: () => ipcRenderer.invoke('stats:get'),
     clear: () => ipcRenderer.invoke('stats:clear')
+  },
+  update: {
+    state: () => ipcRenderer.invoke('update:state'),
+    check: () => ipcRenderer.invoke('update:check'),
+    onState: (cb) => on<UpdateState>('update:state', cb)
   },
   presence: {
     update: (track) => ipcRenderer.send('presence:update', track),
@@ -53,6 +62,9 @@ const bridge: SsBridge = {
     verify: () => ipcRenderer.invoke('library:verify'),
     scan: () => ipcRenderer.invoke('library:scan'),
     remove: (trackId, deleteFiles) => ipcRenderer.invoke('library:remove', trackId, deleteFiles),
+    linkRelease: (releaseId, trackIds, trackTotal) => ipcRenderer.invoke('library:linkRelease', releaseId, trackIds, trackTotal),
+    refresh: () => ipcRenderer.invoke('library:refresh'),
+    onRefreshProgress: (cb) => on<LibraryRefreshProgress>('library:refreshProgress', cb),
     onUpdate: (cb) => on<LibrarySnapshot>('library:update', cb)
   },
   settings: {

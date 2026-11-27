@@ -33,6 +33,32 @@ const data: StatsData = {
   downloads: [{ at: at(2026, 3, 5), trackId: 't1' }, { at: at(2025, 5, 5), trackId: 't9' }]
 }
 
+describe('Artists ohne IDs', () => {
+  it('ordnet Wiedergaben ohne Artist-IDs dem bekannten Artist zu', () => {
+    const tm = { id: 'tm', name: 'Tokyo Machine', uri: 'tokyomachine' }
+    const wg = { id: 'wg', name: 'Weird Genius', uri: 'weird-genius' }
+    const d: StatsData = {
+      plays: [
+        play({ at: at(2026, 3, 1), t: 'x1', a: 'Tokyo Machine', ar: [tm] }),
+        play({ at: at(2026, 3, 2), t: 'x2', a: 'Tokyo Machine', ar: [] }),
+        play({ at: at(2026, 3, 3), t: 'x3', a: 'Weird Genius', ar: [wg] }),
+        play({ at: at(2026, 3, 4), t: 'x4', a: 'Tokyo Machine & Weird Genius feat. Lights', ar: [] }),
+        play({ at: at(2026, 3, 5), t: 'x5', a: 'Above & Beyond', ar: [] })
+      ],
+      events: [],
+      downloads: []
+    }
+    const w = computeFieldReport(d, makePeriod('year', at(2026, 11, 22), 2026))
+    // „Lights“ ist unbekannt → Kollaboration bleibt als Ganzes stehen
+    expect(w.topArtists.map((a) => [a.name, a.id, a.plays])).toEqual([
+      ['Tokyo Machine', 'tm', 2],
+      ['Weird Genius', 'wg', 1],
+      ['Tokyo Machine & Weird Genius feat. Lights', '', 1],
+      ['Above & Beyond', '', 1]
+    ])
+  })
+})
+
 describe('computeFieldReport', () => {
   const w = computeFieldReport(data, makePeriod('year', at(2026, 11, 22), 2026), new Map([['calm', 'moods'], ['energetic', 'moods'], ['synth', 'instruments']]))
 

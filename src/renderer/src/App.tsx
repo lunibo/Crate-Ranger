@@ -1,17 +1,19 @@
 import { useEffect, useRef } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAuth, useDownloads, useFavorites, useLibrary, useQuota, useSettings } from './lib/stores'
 import { initPlayer, usePlayer } from './player/player'
 import { Toasts } from './components/Common'
+import { AutoplayPrompt } from './components/AutoplayPrompt'
+import { UpdatePrompt } from './components/UpdatePrompt'
 import { LoginDialog } from './components/LoginDialog'
 import { PlayerBar } from './layout/PlayerBar'
 import { Sidebar } from './layout/Sidebar'
+import { TitleBar } from './layout/TitleBar'
 import { ArtistPage, ArtistsPage } from './pages/Artist'
 import { Browse } from './pages/Browse'
 import { DownloadsPage } from './pages/Downloads'
 import { Explore } from './pages/Explore'
 import { Home } from './pages/Home'
-import { LibraryPage } from './pages/Library'
 import { FavoritesPage, PlaylistPage, PlaylistsPage, SimilarPage } from './pages/Playlists'
 import { ReleasePage, ReleasesPage } from './pages/Release'
 import { Search } from './pages/Search'
@@ -58,6 +60,7 @@ export function App() {
   return (
     <div className="app">
       <Sidebar />
+      <TitleBar />
       <main className="main" ref={mainRef}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -73,14 +76,20 @@ export function App() {
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/track/:id" element={<TrackPage />} />
           <Route path="/similar/:trackId" element={<SimilarPage />} />
-          <Route path="/library" element={<LibraryPage />} />
-          <Route path="/downloads" element={<DownloadsPage />} />
+          <Route path="/downloads" element={<DownloadsPage tab="queue" />} />
+          <Route path="/downloads/library" element={<DownloadsPage tab="library" />} />
+          <Route path="/library" element={<Navigate to="/downloads/library" replace />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/field-report" element={<FieldReportPage />} />
         </Routes>
       </main>
       <PlayerBar />
-      <Toasts />
+      {/* Hinweise unten rechts, untereinander statt übereinander */}
+      <div className="prompt-stack">
+        <Toasts />
+        <UpdatePrompt />
+        <AutoplayPrompt />
+      </div>
       <LoginDialog />
     </div>
   )

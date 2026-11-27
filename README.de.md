@@ -16,12 +16,22 @@ Bibliotheksverwaltung.
 - **Alles ist verlinkt**: Songtitel öffnen die Track-Seite (Metadaten, Stimmungen/Themen/Instrumente,
   Lyrics, „Erscheint auf“, ähnliche Tracks), Artist-Namen den Artist, Release-Titel und Cover das Release –
   in Listen, Karten, Player, Warteschlange, Downloads und Bibliothek.
-- **Suche**: Namenssuche (Artists, Releases, Playlists, Tracks …) und SoundScout-KI-Suche per Beschreibung;
-  „Ähnliche Tracks“ für jeden Track.
+- **Suche**: Namenssuche (Artists, Releases, Playlists, Tracks …) und SoundScout-KI-Suche per Beschreibung (Enter) –
+  direkt in der Titelleiste, von jeder Seite aus (<kbd>Strg</kbd>+<kbd>K</kbd>); „Ähnliche Tracks“ für jeden Track.
+- **Eigene Titelleiste** im Look der App mit **Zurück/Vor** (auch <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd> und
+  Maus-Seitentasten); die Fensterknöpfe bleiben die des Systems, Windows-Snap-Layouts funktionieren weiter.
 - **Player**: Warteschlange, Zufall, Wiederholen, Spulen, Lautstärke, Windows-Medientasten.
   Eingeloggt in voller Länge (MP3 320). Heruntergeladene Tracks werden lokal abgespielt.
+- **Weiterhören**: Die App merkt sich Warteschlange, Track und Position – nach dem Neustart geht es mit „Play“
+  genau dort weiter.
+- **Endlos hören** (Einstellungen → Wiedergabe): Ist die Warteschlange, ein Album oder ein Song zu Ende, laufen
+  ähnliche Tracks weiter – ohne Versionen von Songs, die schon liefen. Beim ersten Ende fragt die App einmal nach.
 - **Playlists & Favoriten** des eigenen Kontos. Ein Herz in der Player-Leiste (laufender Song), in jeder
   Trackzeile und auf der Track-Seite fügt Songs den SoundScout-Favoriten hinzu bzw. entfernt sie.
+  Eigene Playlists lassen sich anlegen, umbenennen (Klick auf den Titel), löschen und durchsuchen; Tracks kommen
+  über „Zur Playlist hinzufügen“ hinein (mit Suche, neue Playlist direkt dort anlegbar).
+- **Rechtsklick-Menüs** auf jedem Track – auch dem laufenden in der Player-Leiste – und auf Playlist-Karten:
+  als Nächstes spielen, zur Warteschlange, zur Playlist, ähnliche Tracks, zum Release, Download u. a.
 - **Downloads** (FLAC, MP3 320, WAV) für Track, Release, Playlist, Favoriten oder die geladenen Tracks
   einer Artist-/Katalogansicht, mit Warteschlange
   (parallel, pausier- und fortsetzbar). Bei Kontingent- oder Abo-Fehlern hält die Warteschlange an.
@@ -50,6 +60,8 @@ Bibliotheksverwaltung.
   ID3-Header der SoundScout-Dateien entfernt; das Audio bleibt bitgenau unverändert.
 - **Bibliothek**: merkt sich jeden Download (Status ✓ in allen Listen, Release-Fortschritt x/y),
   erkennt fehlende Dateien und liest bestehende Downloads per „Ordner scannen“ wieder ein.
+  **„Tags & Ordner aktualisieren“** schreibt die Tags aller Downloads neu und sortiert sie in die aktuelle
+  Ordnerstruktur ein – ohne erneuten Download, also ohne Kontingent.
 
 ## Sprachen
 
@@ -69,16 +81,6 @@ geändert werden. Technik: [i18next](https://www.i18next.com) / react-i18next, g
 und Hauptprozess (`src/shared/i18n.ts`), typsichere Schlüssel mit `en.json` als Referenz (`src/shared/i18next.d.ts`).
 In die Audiodateien geschriebene Metadaten (z. B. der Kommentar) bleiben bewusst sprachunabhängig auf Englisch.
 
-## Discord-Status einrichten
-
-Discord Rich Presence braucht eine Discord-Application – deren Name erscheint im Status als „Hört <Name>“.
-Crate Ranger bringt eine fest hinterlegte Application mit; Nutzer brauchen nur den Schalter in den Einstellungen.
-
-Wer das Projekt forkt und eine eigene Application nutzen möchte: im
-[Discord Developer Portal](https://discord.com/developers/applications) „New Application“ anlegen (z. B. **SoundScout**),
-die **Application ID** kopieren und in `src/shared/discord.ts` als `DEFAULT_DISCORD_CLIENT_ID` eintragen.
-Die ID ist öffentlich und kein Geheimnis.
-
 ## Ordnerstruktur
 
 Standard (in den Einstellungen änderbar):
@@ -93,6 +95,8 @@ Standard (in den Einstellungen änderbar):
 ```
 
 Bei Compilations steht der Track-Artist im Dateinamen (`03 - Feint - Time Bomb.flac`).
+Featured-Artists landen nicht im Ordnernamen („Stonebank feat. EMEL“ → `Stonebank/`), damit alle Releases eines
+Artists zusammenliegen; im Album-Artist-Tag bleibt der volle Name (Platzhalter `{releaseArtistFull}` für den Ordner).
 Namen werden für Windows bereinigt; zu lange Pfade werden automatisch gekürzt.
 
 ## Anmeldung
@@ -116,6 +120,12 @@ Fertige Versionen gibt es unter **Releases** dieses Repositorys:
 
 Die Windows-Dateien sind nicht code-signiert; SmartScreen fragt beim ersten Start nach
 („Weitere Informationen“ → „Trotzdem ausführen“).
+
+**Update-Prüfung:** Beim ersten Start fragt die App, ob sie nach neuen Versionen suchen darf. Mit Zustimmung ruft sie
+höchstens alle 6 Stunden die öffentliche Release-Liste dieses Repositorys über die GitHub-API ab (keine Konto- oder
+Nutzungsdaten; GitHub sieht wie bei jedem Abruf die IP-Adresse) und weist auf neue Releases hin – heruntergeladen wird
+nur, wenn du es selbst tust. Abschaltbar unter *Einstellungen → Updates*. Bei einem Fork `UPDATE_REPO` in
+`src/shared/update.ts` anpassen.
 
 ## Release veröffentlichen
 

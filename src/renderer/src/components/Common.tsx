@@ -3,9 +3,10 @@ import { fmtDateTime } from '../lib/format'
 import { useTranslation } from 'react-i18next'
 import type { DownloadFormat } from '@shared/types'
 import { FORMAT_LABEL } from '@shared/types'
-import { errorMessage } from '../lib/api'
+import { errorMessage, type TrackLite } from '../lib/api'
 import { useSettings, useToasts } from '../lib/stores'
-import { IconAlert, IconDownload, IconX } from './Icons'
+import { IconAlert, IconDownload, IconMore, IconX } from './Icons'
+import { usePlayer } from '../player/player'
 
 export function Spinner({ label }: { label?: string }) {
   return (
@@ -165,5 +166,44 @@ export function Chip({ active, onClick, children }: { active?: boolean; onClick?
     <button className={`chip ${active ? 'active' : ''}`} onClick={onClick}>
       {children}
     </button>
+  )
+}
+
+/** ⋯-Menü im Seitenkopf (Release, Track): Tracks in die Wiedergabe-Warteschlange */
+export function QueueMenu({ tracks, playNextLabel, addLabel }: { tracks: TrackLite[]; playNextLabel: string; addLabel: string }) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent): void => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('mousedown', close)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', close)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+  const act = (fn: () => void) => () => {
+    fn()
+    setOpen(false)
+  }
+  return (
+    <div className="dl-menu" ref={ref}>
+      <button className="icon-btn" disabled={!tracks.length} onClick={() => setOpen((o) => !o)} aria-label={t('common.more')} title={t('common.more')}>
+        <IconMore size={22} />
+      </button>
+      {open && (
+        <div className="menu" role="menu">
+          <button className="menu-item" onClick={act(() => usePlayer.getState().playNext(tracks))}>{playNextLabel}</button>
+          <button className="menu-item" onClick={act(() => usePlayer.getState().addToQueue(tracks))}>{addLabel}</button>
+        </div>
+      )}
+    </div>
   )
 }

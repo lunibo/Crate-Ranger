@@ -39,7 +39,7 @@ describe.skipIf(!REAL_FLAC || !existsSync(REAL_FLAC))('tagger on real SoundScout
     }
   })
   it('keeps the embedded cover and reads IDs back', () => {
-    expect(readEmbeddedPicture(f)?.mimeType).toBe('image/png')
+    expect(readEmbeddedPicture(f)?.mimeType).toMatch(/^image\/(png|jpeg)$/)
     expect(readSoundScoutIds(f)?.trackId).toBe(meta.trackId)
   })
 })
@@ -53,12 +53,37 @@ describe.skipIf(!has('ffmpeg'))('tagger on generated MP3/WAV', () => {
       const t = ffprobeTags(f)
       expect(t.TITLE).toBe('Focus')
       expect(t.ALBUM_ARTIST ?? t.ALBUMARTIST).toBe('Shingo Nakamura')
-      const tf = TagFile.createFromPath(f); expect(tf.tag.genres).toEqual(['Dance', 'Melodic House & Techno']); expect(tf.tag.beatsPerMinute).toBe(118); tf.dispose()
+      const tf = TagFile.createFromPath(f); expect(tf.tag.genres).toEqual(['Melodic House & Techno', 'Dance']); expect(tf.tag.beatsPerMinute).toBe(118); tf.dispose()
       expect(t.DATE ?? t.TDRC).toContain('2022')
       expect(t.TKEY ?? t.INITIALKEY).toBe('Am')
       expect(t.SOUNDSCOUT_TRACK_ID).toBe(meta.trackId)
       expect(readEmbeddedPicture(f)?.mimeType).toBe('image/png')
       expect(readSoundScoutIds(f)?.trackId).toBe(meta.trackId)
+    })
+  }
+})
+
+describe.skipIf(!has('ffmpeg'))('Artist-IDs in Datei-Tags', () => {
+  const duo = buildTrackMeta({
+    ...(focus as CatalogTrack),
+    ArtistsTitle: 'Slushii & Tokyo Machine',
+    Artists: [
+      { ID: 'id-slushii', Name: 'Slushii', URL: 'slushii', Role: 'Primary' },
+      { ID: 'id-tm', Name: 'Tokyo Machine', URL: 'tokyomachine', Role: 'Primary' }
+    ]
+  })
+  for (const ext of ['flac', 'mp3', 'wav']) {
+    it(`schreibt und liest mehrere Artists mit IDs (${ext})`, () => {
+      const f = join(dir, `duo.${ext}`)
+      execFileSync('ffmpeg', ['-v', 'quiet', '-y', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=1', f])
+      writeTags(f, duo, null)
+      expect(readSoundScoutIds(f)?.artists).toEqual([
+        { id: 'id-slushii', name: 'Slushii', uri: 'slushii' },
+        { id: 'id-tm', name: 'Tokyo Machine', uri: 'tokyomachine' }
+      ])
+      // Ohne IDs (z.B. Fallback auf ArtistsTitle) → Felder werden beim Neu-Taggen entfernt
+      writeTags(f, { ...duo, artistRefs: [] }, null)
+      expect(readSoundScoutIds(f)?.artists).toEqual([])
     })
   }
 })

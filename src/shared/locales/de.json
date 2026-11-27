@@ -26,7 +26,6 @@
   },
   "nav": {
     "home": "Start",
-    "search": "Suche",
     "catalog": "Katalog",
     "explore": "Entdecken",
     "artists": "Artists",
@@ -37,7 +36,9 @@
     "downloads": "Downloads",
     "settings": "Einstellungen",
     "accountSettings": "Konto & Einstellungen",
-    "report": "Field Report"
+    "report": "Field Report",
+    "back": "Zurück (Alt+←)",
+    "forward": "Vor (Alt+→)"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -86,10 +87,27 @@
   "trackMenu": {
     "playNext": "Als Nächstes spielen",
     "addToQueue": "Zur Warteschlange",
+    "addToPlaylist": "Zur Playlist hinzufügen",
     "similar": "Ähnliche Tracks",
     "details": "Track-Details",
     "goToRelease": "Zum Release",
-    "openOnSoundScout": "Auf SoundScout öffnen"
+    "openOnSoundScout": "Auf SoundScout öffnen",
+    "back": "Zurück"
+  },
+  "playlistMenu": {
+    "create": "Neue Playlist",
+    "createNamed": "Neue Playlist „{{name}}“ erstellen",
+    "namePlaceholder": "Name der Playlist",
+    "createButton": "Erstellen",
+    "loading": "Playlists werden geladen…",
+    "empty": "Noch keine eigenen Playlists",
+    "loadFailed": "Playlists konnten nicht geladen werden",
+    "search": "Playlists durchsuchen…",
+    "noMatch": "Keine passende Playlist",
+    "added": "„{{title}}“ zu „{{playlist}}“ hinzugefügt",
+    "addFailed": "Konnte nicht zu „{{playlist}}“ hinzufügen: {{error}}",
+    "created": "Playlist „{{playlist}}“ erstellt und „{{title}}“ hinzugefügt",
+    "createFailed": "Playlist konnte nicht erstellt werden: {{error}}"
   },
   "track": {
     "kind": "Song",
@@ -151,7 +169,9 @@
     "playbackFailed": "Wiedergabe fehlgeschlagen: {{error}}",
     "playingNext": "„{{title}}“ wird als Nächstes gespielt",
     "addedToQueue_one": "{{count}} Track zur Warteschlange hinzugefügt",
-    "addedToQueue_other": "{{count}} Tracks zur Warteschlange hinzugefügt"
+    "addedToQueue_other": "{{count}} Tracks zur Warteschlange hinzugefügt",
+    "playingNextMany_one": "{{count}} Track wird als Nächstes gespielt",
+    "playingNextMany_other": "{{count}} Tracks werden als Nächstes gespielt"
   },
   "download": {
     "download": "Herunterladen",
@@ -170,7 +190,7 @@
     "signInRequired": "Zum Herunterladen bitte zuerst bei SoundScout anmelden."
   },
   "downloads": {
-    "summary": "{{open}} offen · {{done}} fertig · {{skipped}} übersprungen · {{errors}} Fehler",
+    "summary": "{{open}} offen · {{done}} fertig · {{copied}} kopiert · {{skipped}} übersprungen · {{errors}} Fehler",
     "paused": "Warteschlange pausiert",
     "pausedReason": "Warteschlange pausiert: {{reason}}",
     "resume": "Fortsetzen",
@@ -178,7 +198,8 @@
     "retryAt": "Server ausgelastet – nächster Versuch um {{time}}.",
     "retryFailed": "Fehlgeschlagene wiederholen",
     "clearFinished": "Erledigte entfernen",
-    "empty": "Keine Downloads. Starte einen Download über den Download-Button bei Tracks, Releases oder Playlists."
+    "empty": "Keine Downloads. Starte einen Download über den Download-Button bei Tracks, Releases oder Playlists.",
+    "tabQueue": "Warteschlange"
   },
   "jobStatus": {
     "queued": "Wartet",
@@ -186,6 +207,7 @@
     "downloading": "Lädt",
     "tagging": "Tags & Cover",
     "done": "Fertig",
+    "copied": "Kopiert",
     "skipped": "Bereits vorhanden",
     "error": "Fehler",
     "cancelled": "Abgebrochen"
@@ -220,7 +242,9 @@
     "moreFrom": "Mehr von {{artist}}",
     "goToArtist": "Zum Artist",
     "play": "„{{title}}“ abspielen",
-    "noTracks": "Dieses Release hat keine abspielbaren Tracks."
+    "noTracks": "Dieses Release hat keine abspielbaren Tracks.",
+    "playNext": "Release als Nächstes spielen",
+    "addToQueue": "Release zur Warteschlange hinzufügen"
   },
   "preRelease": {
     "badge": "Pre-Release",
@@ -242,7 +266,20 @@
     "curated": "Kuratierte Playlists",
     "empty": "Diese Playlist ist leer.",
     "loadedDownloaded_one": "{{count}} der geladenen Tracks heruntergeladen",
-    "loadedDownloaded_other": "{{count}} der geladenen Tracks heruntergeladen"
+    "loadedDownloaded_other": "{{count}} der geladenen Tracks heruntergeladen",
+    "renameSave": "Speichern",
+    "renamed": "Playlist in „{{name}}“ umbenannt",
+    "renameFailed": "Umbenennen fehlgeschlagen: {{error}}",
+    "delete": "Löschen",
+    "deleteConfirm": "Playlist „{{name}}“ löschen? Das lässt sich nicht rückgängig machen.",
+    "deleteStart": "Endgültig löschen",
+    "deleted": "Playlist „{{name}}“ gelöscht",
+    "deleteFailed": "Löschen fehlgeschlagen: {{error}}",
+    "playNow": "Abspielen",
+    "playTitle": "„{{title}}“ abspielen",
+    "renameEllipsis": "Umbenennen…",
+    "deleteEllipsis": "Löschen…",
+    "renameHint": "Klicken zum Umbenennen"
   },
   "similar": {
     "titleWith": "Ähnlich wie <link>„{{title}}“</link>",
@@ -269,7 +306,8 @@
       "genre": "Genres",
       "mood": "Stimmungen",
       "theme": "Themen"
-    }
+    },
+    "clear": "Suche leeren"
   },
   "browse": {
     "sort": {
@@ -311,7 +349,15 @@
     "missingNotice_other": "{{count}} Tracks fehlen auf der Festplatte (verschoben oder gelöscht).",
     "empty": "Noch nichts heruntergeladen. Bereits vorhandene Downloads lassen sich mit „Ordner scannen“ einlesen.",
     "downloadMissing": "Fehlende nachladen",
-    "unknownArtist": "Unbekannt"
+    "unknownArtist": "Unbekannt",
+    "refresh": "Tags & Ordner aktualisieren",
+    "refreshHint": "Liest die Metadaten neu von SoundScout, schreibt die Tags neu und sortiert die Dateien in die aktuelle Ordnerstruktur ein. Lädt nichts herunter – zählt nicht aufs Kontingent.",
+    "refreshConfirm": "Tags aller {{count}} heruntergeladenen Dateien neu schreiben und die Dateien in die aktuelle Ordnerstruktur („{{template}}“) verschieben? Leere alte Ordner werden entfernt, heruntergeladen wird nichts.",
+    "refreshStart": "Jetzt aktualisieren",
+    "refreshProgress": "Aktualisiere… {{done}}/{{total}}",
+    "refreshResult": "{{retagged}} Dateien aktualisiert, {{moved}} verschoben",
+    "refreshFailed_one": "{{count}} Datei konnte nicht aktualisiert werden: {{error}}",
+    "refreshFailed_other": "{{count}} Dateien konnten nicht aktualisiert werden, z.B. {{error}}"
   },
   "settings": {
     "folderChanged": "Download-Ordner geändert. Tipp: „Ordner scannen“ unter „Heruntergeladen“ liest vorhandene Dateien ein.",
@@ -342,6 +388,8 @@
       "restoreDefault": "Standard wiederherstellen",
       "concurrency": "Gleichzeitige Downloads",
       "skipExisting": "Bereits heruntergeladene Tracks überspringen (spart Download-Kontingent)",
+      "copyToAllReleases": "Tracks in jedem Release ablegen",
+      "copyToAllReleasesHint": "Gehört ein bereits geladener Track auch zu einem anderen Release (z. B. Single und Album), wird die Datei in dessen Ordner kopiert und mit dessen Metadaten und Cover getaggt – ohne erneuten Download. Für bereits geladene Releases einfach das Release noch einmal herunterladen.",
       "saveCover": "cover.jpg im Release-Ordner ablegen"
     },
     "metadata": {
@@ -369,13 +417,30 @@
       "confirm": "Alle Hörstatistiken endgültig löschen?",
       "confirmYes": "Löschen",
       "cleared": "Hörstatistik gelöscht"
+    },
+    "cache": {
+      "title": "Cache",
+      "covers": "Cover",
+      "images_one": "{{formatted}} Bild",
+      "images_other": "{{formatted}} Bilder",
+      "data": "Katalogdaten",
+      "entries_one": "{{formatted}} Eintrag",
+      "entries_other": "{{formatted}} Einträge",
+      "browser": "Browser-Cache",
+      "total": "Gesamt",
+      "hint": "Cover (max. 300 MB) und Katalogdaten werden zwischengespeichert, damit Seiten schneller laden. Musik wird nicht zwischengespeichert, sondern gestreamt – heruntergeladene Tracks sind davon nicht betroffen.",
+      "clear": "Cache leeren",
+      "confirm": "Cover, Katalogdaten und Browser-Cache löschen? Heruntergeladene Tracks bleiben erhalten.",
+      "confirmYes": "Leeren",
+      "cleared": "Cache geleert"
     }
   },
   "queue": {
     "restoredPaused": "Offene Downloads aus der letzten Sitzung – zum Fortsetzen auf „Fortsetzen“ klicken.",
     "signInRequired": "Nicht angemeldet – bitte anmelden und dann fortsetzen.",
     "pausedManually": "Manuell pausiert",
-    "retryIn": "{{message}} – neuer Versuch in {{seconds}} s"
+    "retryIn": "{{message}} – neuer Versuch in {{seconds}} s",
+    "pausedForRefresh": "Pausiert, während die Bibliothek aktualisiert wird"
   },
   "discord": {
     "by": "von {{artists}}",
@@ -389,7 +454,10 @@
     "incompleteDownload": "Unvollständiger Download ({{loaded}}/{{total}} Bytes)",
     "invalidSessionValue": "Das sieht nicht wie ein gültiger goldloginz-Wert aus.",
     "sessionRejected": "SoundScout hat die Sitzung nicht akzeptiert (abgelaufen oder falsch kopiert?).",
-    "preRelease": "Pre-Release – Download erst ab Release ({{date}})"
+    "preRelease": "Pre-Release – Download erst ab Release ({{date}})",
+    "refreshRunning": "Die Bibliothek wird bereits aktualisiert.",
+    "refreshBusy": "Es laufen noch Downloads – aktualisiere die Bibliothek, wenn sie fertig sind.",
+    "targetExists": "Unter {{path}} liegt bereits eine andere Datei"
   },
   "report": {
     "showChart": "Diagramm",
@@ -525,5 +593,45 @@
       "next": "Weiter"
     },
     "quoted": "„{{text}}“"
+  },
+  "autoplay": {
+    "settingsTitle": "Wiedergabe",
+    "enable": "Endlos hören",
+    "hint": "Wenn deine Warteschlange, ein Album oder ein einzelner Song zu Ende ist, laufen automatisch ähnliche Tracks weiter. Braucht eine Anmeldung.",
+    "queueHeading": "Endlos hören · ähnliche Tracks",
+    "promptTitle": "Einfach weiterhören?",
+    "promptText": "Deine Musik ist zu Ende. Mit „Endlos hören“ laufen danach automatisch ähnliche Tracks weiter.",
+    "promptYes": "Endlos hören aktivieren",
+    "promptNo": "Nein, danke",
+    "promptHint": "Lässt sich jederzeit in den Einstellungen ändern."
+  },
+  "update": {
+    "settingsTitle": "Updates",
+    "enable": "Beim Start nach neuen Versionen suchen",
+    "hint": "Fragt höchstens alle 6 Stunden die öffentliche Release-Liste auf GitHub ab. Es werden keine Konto- oder Nutzungsdaten übertragen; GitHub sieht dabei – wie bei jedem Abruf – deine IP-Adresse.",
+    "installed": "Installierte Version",
+    "latest": "Neueste Version",
+    "checkNow": "Jetzt prüfen",
+    "checking": "Prüfe…",
+    "upToDate": "Du hast die neueste Version.",
+    "availableShort": "Update verfügbar: {{version}}",
+    "failed": "Prüfung fehlgeschlagen ({{error}})",
+    "checkedAt": "zuletzt geprüft {{date}}",
+    "download": "Zum Download",
+    "later": "Später",
+    "availableTitle": "Version {{version}} ist da",
+    "availableText": "Du nutzt noch {{current}}. Die neue Version kannst du auf GitHub herunterladen.",
+    "consentTitle": "Nach Updates suchen?",
+    "consentText": "Crate Ranger kann beim Start auf GitHub nachsehen, ob es eine neue Version gibt. Dabei wird nur die öffentliche Release-Liste abgerufen – ohne Konto- oder Nutzungsdaten.",
+    "consentYes": "Ja, nach Updates suchen",
+    "consentNo": "Nein",
+    "consentHint": "Lässt sich jederzeit in den Einstellungen ändern."
+  },
+  "playQueue": {
+    "clear": "Leeren",
+    "clearHint": "Alle kommenden Tracks entfernen – der aktuelle läuft weiter",
+    "remove": "Aus der Warteschlange entfernen",
+    "upNext": "Als Nächstes",
+    "empty": "Keine weiteren Tracks in der Warteschlange."
   }
 }
